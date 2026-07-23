@@ -1,0 +1,102 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+{% block title %}Meteorologia - AgroVision{% endblock %}
+{% block titulo_pagina %}Previsão <span>Meteorológica</span>{% endblock %}
+{% block explicacao_voz %}
+{% if dados_clima and not dados_clima.erro %}
+Encontrei a meteorologia de {{ dados_clima.cidade }}. {% if dados_clima.provincia %}A localidade pertence à província de {{ dados_clima.provincia }}. A análise usa as coordenadas desta localidade para representar as condições meteorológicas da zona. {% endif %}A condição atual é {{ dados_clima.descricao }}, com temperatura de {{ dados_clima.temperatura }} graus Celsius, humidade de {{ dados_clima.humidade|default:'valor não disponível' }} por cento, vento de {{ dados_clima.vento }} quilómetros por hora e precipitação de {{ dados_clima.precipitacao|default:'zero' }} milímetros. {{ dados_clima.analise_agricola.texto }} {% if dados_clima.analise_agricola.culturas %}As culturas que podem ser avaliadas, depois de confirmar solo, água e época agrícola, são: {{ dados_clima.analise_agricola.culturas|join:", " }}.{% endif %} Observação importante: {{ dados_clima.analise_agricola.aviso }}
+{% else %}
+Esta é a área de meteorologia. Pesquise uma cidade, província ou município para consultar a condição atual e a previsão de sete dias. O sistema usa esses dados para explicar riscos de calor, chuva, vento, irrigação e doenças, mas a decisão agrícola também precisa de solo, água e observação de campo.
+{% endif %}
+{% endblock %}
+{% block conteudo %}
+<div class="tool-panel mb-20">
+    <div>
+        <p class="panel-kicker">Consulta climática</p>
+        <h3>Pesquisar previsão por cidade</h3>
+        <p>Use a previsão para apoiar visitas técnicas, rega, pulverização e alertas de risco.</p>
+    </div>
+    <div>
+        <form method="get" class="search-form" aria-label="Pesquisa meteorológica" data-weather-search>
+            <div class="search-field">
+                <label for="id_cidade"><i class="fas fa-location-dot"></i> Cidade, província ou município</label>
+                <input id="id_cidade" type="text" name="cidade" list="localidades-angola" placeholder="Ex.: Huambo, Caconda ou Cela" value="{{ cidade_pesquisada }}" class="form-control" autocomplete="address-level2">
+            </div>
+            <datalist id="localidades-angola">
+                {% for local in localidades_angola %}
+                <option value="{{ local }}">
+                {% endfor %}
+            </datalist>
+            <button type="submit" class="btn btn-primary"><img class="button-icon" src="{% static 'img/icons/pesquisa.webp' %}" alt=""> Pesquisar</button>
+        </form>
+        <p class="form-note">
+            <i class="fas fa-info-circle"></i> Provedor atual: <strong>{{ config.get_provedor_display }}</strong>
+            {% if not config.api_key and config.provedor == 'openweather' %}
+                <span>Configure a chave da API no painel admin.</span>
+            {% endif %}
+        </p>
+    </div>
+</div>
+
+<!-- Resultado -->
+{% if dados_clima %}
+    {% if dados_clima.erro %}
+    <div class="alert alert-error"><i class="fas fa-exclamation-triangle"></i> {{ dados_clima.erro }}</div>
+    {% else %}
+    <div class="voice-actions">
+        <button type="button" class="btn btn-outline" style="width:auto;" data-speech-target="#explicacao-contextual">
+            <i class="fas fa-volume-high"></i> Explicar meteorologia
+        </button>
+    </div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon laranja"><img src="{% static 'img/icons/temperatura.webp' %}" alt="Temperatura"></div>
+            <div class="stat-info"><h3>{{ dados_clima.temperatura }}°C</h3><p>Temperatura — {{ dados_clima.cidade }}</p></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon azul"><img src="{% static 'img/icons/humidade.webp' %}" alt="Humidade"></div>
+            <div class="stat-info"><h3>{{ dados_clima.humidade|default:'—' }}%</h3><p>Humidade</p></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon verde"><img src="{% static 'img/icons/vento.webp' %}" alt="Vento"></div>
+            <div class="stat-info"><h3>{{ dados_clima.vento }} km/h</h3><p>Vento</p></div>
+        </div>
+    </div>
+    <div class="table-card">
+        <div class="table-header"><h3><i class="fas fa-cloud"></i> Condição Atual</h3></div>
+        <div class="condition-box">
+            <h3>{{ dados_clima.descricao }}</h3>
+            <p>Precipitação atual: <strong>{{ dados_clima.precipitacao|default:'0' }} mm</strong></p>
+            <p>Local consultado: <strong>{{ dados_clima.cidade }}</strong>{% if dados_clima.provincia %}, província de {{ dados_clima.provincia }}{% endif %}{% if dados_clima.latitude %} ({{ dados_clima.latitude|floatformat:3 }}, {{ dados_clima.longitude|floatformat:3 }}){% endif %}</p>
+            <p>Dados fornecidos por: <strong>{{ dados_clima.provedor }}</strong> · Atualização: {{ dados_clima.consultado_em }}</p>
+        </div>
+    </div>
+    {% if dados_clima.analise_agricola %}
+    <div class="table-card">
+        <div class="table-header"><h3><i class="fas fa-seedling"></i> Análise agrícola da área</h3></div>
+        <div class="condition-box">
+            <p>{{ dados_clima.analise_agricola.texto }}</p>
+            {% if dados_clima.analise_agricola.culturas %}<p><strong>Culturas a avaliar:</strong> {{ dados_clima.analise_agricola.culturas|join:", " }}.</p>{% endif %}
+            <p class="form-note"><i class="fas fa-circle-info"></i> {{ dados_clima.analise_agricola.aviso }}</p>
+            <p class="form-note">Análise: <strong>{{ dados_clima.analise_agricola.motor }}</strong></p>
+        </div>
+    </div>
+    {% endif %}
+    {% if dados_clima.previsao_7_dias %}
+    <div class="table-card">
+        <div class="table-header"><h3><i class="fas fa-calendar-days"></i> Previsão agrícola — próximos 7 dias</h3></div>
+        <div class="table-responsive"><table><thead><tr><th>Data</th><th>Mínima</th><th>Máxima</th><th>Chuva</th><th>Probabilidade</th></tr></thead><tbody>
+        {% for dia in dados_clima.previsao_7_dias %}<tr><td>{{ dia.data }}</td><td>{{ dia.minima|default:'—' }} °C</td><td>{{ dia.maxima|default:'—' }} °C</td><td>{{ dia.chuva|default:'0' }} mm</td><td>{{ dia.probabilidade|default:'0' }}%</td></tr>{% endfor %}
+        </tbody></table></div>
+        <p class="form-note">Fonte: <a href="{{ dados_clima.fonte_url }}" target="_blank" rel="noopener">Open‑Meteo</a>. Previsões são estimativas de modelos meteorológicos e podem mudar.</p>
+    </div>
+    {% endif %}
+    {% endif %}
+{% else %}
+<div class="table-card"><div style="padding:28px" class="empty-state"><i class="fas fa-cloud"></i><strong>Pesquise uma cidade para obter dados reais</strong><span>A condição atual e a previsão serão consultadas diretamente no provedor meteorológico configurado. Se a internet ou a API falhar, nenhum valor inventado será apresentado.</span></div></div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if cidade_pesquisada and dados_clima and not dados_clima.erro %}<script>document.getElementById('explicacao-contextual')?.setAttribute('data-speech-auto', 'true');</script>{% endif %}
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}{{ propriedade.nome }} - AgroVision{% endblock %}
+{% block titulo_pagina %}{{ propriedade.nome }}{% endblock %}
+
+{% block conteudo %}
+{% if not propriedade.consultor_responsavel or not propriedade.tecnico_responsavel or not propriedade.analista_responsavel %}
+<div class="alert alert-warning mb-20"><i class="fas fa-user-clock"></i> <strong>Equipa em atribuição.</strong> A administração ainda está a selecionar todos os profissionais que acompanharão esta propriedade. Os nomes aparecerão aqui depois da atribuição.</div>
+{% else %}
+<div class="alert alert-success mb-20"><i class="fas fa-users"></i> <strong>Equipa de acompanhamento definida.</strong> Consulte abaixo os profissionais responsáveis por esta propriedade.</div>
+{% endif %}
+{% if request.user.is_admin or request.user.is_agricultor %}<div class="mb-20" style="display:flex;gap:10px;flex-wrap:wrap;"><a href="{% url 'propriedades:editar' propriedade.pk %}" class="btn btn-primary" style="width:auto;"><i class="fas fa-pen"></i> Editar propriedade</a><a href="{% url 'propriedades:novo_talhao' %}" class="btn btn-outline" style="width:auto;"><i class="fas fa-plus"></i> Adicionar talhão</a></div>{% endif %}
+{% if propriedade.foto_capa %}<div class="agro-cover"><img src="{{ propriedade.foto_capa.url }}" alt="{{ propriedade.nome }}"><div><strong>Imagem da propriedade</strong><span>{{ propriedade.localizacao|default:"Localização não informada" }}</span></div></div>{% endif %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon verde"><i class="fas fa-user"></i></div>
+        <div class="stat-info"><h3 style="font-size:1.2rem;">{{ propriedade.proprietario.nome_completo }}</h3><p>Proprietário</p></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon laranja"><i class="fas fa-user-tie"></i></div>
+        <div class="stat-info"><h3 style="font-size:1.2rem;">{{ propriedade.consultor_responsavel.nome_completo|default:'—' }}</h3><p>Consultor</p></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon azul"><i class="fas fa-map-marked-alt"></i></div>
+        <div class="stat-info"><h3 style="font-size:1.2rem;">{{ propriedade.area_total|default:'—' }} ha</h3><p>Área / {{ propriedade.localizacao|default:'N/A' }}</p></div>
+    </div>
+</div>
+
+<div class="table-card mb-20">
+    <div class="table-header"><h3><i class="fas fa-users"></i> Equipa de acompanhamento</h3></div>
+    <table><thead><tr><th>Função</th><th>Profissional</th><th>Responsabilidade</th></tr></thead><tbody>
+        <tr><td>Consultor agrícola</td><td>{{ propriedade.consultor_responsavel.nome_completo|default:'Por atribuir' }}</td><td>Analisa os dados e valida as recomendações.</td></tr>
+        <tr><td>Técnico de campo</td><td>{{ propriedade.tecnico_responsavel.nome_completo|default:'Por atribuir' }}</td><td>Realiza visitas e regista ocorrências no campo.</td></tr>
+        <tr><td>Analista de dados</td><td>{{ propriedade.analista_responsavel.nome_completo|default:'Por atribuir' }}</td><td>Acompanha indicadores, histórico e qualidade dos dados.</td></tr>
+    </tbody></table>
+    {% if request.user.is_admin or request.user.is_superuser %}<div style="padding:16px;"><a href="{% url 'propriedades:editar' propriedade.pk %}" class="btn btn-primary" style="width:auto;"><i class="fas fa-user-plus"></i> Atribuir ou alterar equipa</a></div>{% endif %}
+</div>
+
+<div class="table-card">
+    <div class="table-header">
+        <h3><i class="fas fa-seedling"></i> Talhões da Propriedade</h3>
+    </div>
+    <table>
+        <thead><tr><th>Nome</th><th>Cultura</th><th>Área</th><th>Tipo de Solo</th>{% if request.user.is_admin or request.user.is_agricultor %}<th>Ações</th>{% endif %}</tr></thead>
+        <tbody>
+            {% for t in talhoes %}
+            <tr><td>{{ t.nome }}</td><td>{{ t.cultura|default:'—' }}</td><td>{{ t.area|default:'—' }} ha</td><td>{{ t.tipo_solo|default:'—' }}</td>{% if request.user.is_admin or request.user.is_agricultor %}<td><a href="{% url 'propriedades:editar_talhao' t.pk %}" class="btn btn-outline" style="width:auto;padding:6px 12px;">Editar</a></td>{% endif %}</tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center">Nenhum talhão registado.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="intelligence-card">
+    <div><span class="ai-label">PREVISÃO EXPLICÁVEL</span><h3>Próxima produção estimada</h3></div>
+    {% if previsao_producao.disponivel %}<div class="prediction-number">{{ previsao_producao.valor }} <small>{{ previsao_producao.unidade }}</small></div><p>Confiança <strong>{{ previsao_producao.confianca }}</strong> · {{ previsao_producao.amostras }} campanha(s) comparável(is) · tendência {{ previsao_producao.tendencia }}</p><ul>{% for fator in previsao_producao.fatores %}<li>{{ fator }}</li>{% endfor %}</ul><div class="prediction-warning">{{ previsao_producao.aviso }}</div>{% else %}<p>{{ previsao_producao.mensagem }}</p>{% endif %}
+</div>
+
+<div class="table-card">
+    <div class="table-header"><h3><i class="fas fa-wheat-awn"></i> Produção e colheitas</h3>{% if request.user.is_admin or request.user.is_consultor or request.user.is_tecnico or request.user.is_agricultor %}<a href="{% url 'propriedades:nova_producao' propriedade.pk %}" class="btn btn-primary" style="width:auto;">Registar colheita</a>{% endif %}</div>
+    <table><thead><tr><th>Foto</th><th>Talhão</th><th>Campanha</th><th>Data</th><th>Produção</th><th>Qualidade</th></tr></thead><tbody>
+    {% for item in producoes %}<tr><td>{% if item.foto_colheita %}<img class="agro-thumb" src="{{ item.foto_colheita.url }}" alt="Colheita">{% else %}—{% endif %}</td><td>{{ item.talhao.nome }}</td><td>{{ item.campanha }}</td><td>{{ item.data_colheita|date:"d/m/Y" }}</td><td>{{ item.quantidade }} {{ item.get_unidade_display }}</td><td>{{ item.qualidade|default:"—" }}</td></tr>{% empty %}<tr><td colspan="6" class="text-center">Nenhuma produção registada.</td></tr>{% endfor %}
+    </tbody></table>
+</div>
+
+<div class="mt-20">
+    <a href="{% url 'propriedades:lista' %}" class="btn btn-outline" style="width: auto;"><i class="fas fa-arrow-left"></i> Voltar</a>
+</div>
+{% endblock %}

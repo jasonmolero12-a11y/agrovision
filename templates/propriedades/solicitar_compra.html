@@ -1,0 +1,16 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Pedido de compra - AgroVision{% endblock %}
+{% block titulo_pagina %}Solicitar <span>compra</span>{% endblock %}
+{% block explicacao_voz %}Esta área permite enviar um pedido comercial para a propriedade {{ propriedade.nome }}. Escolha um lote disponível, indique a quantidade pretendida e um contacto. A administração receberá o pedido e acompanhará a negociação com o fornecedor.{% endblock %}
+{% block conteudo %}
+<div class="table-card" style="max-width:900px;margin:0 auto"><div class="table-header"><h3><i class="fas fa-cart-shopping"></i> Pedido para {{ propriedade.nome }}</h3></div><div style="padding:24px">
+<div class="alert alert-info"><strong>Local:</strong> {{ propriedade.localizacao|default:'Não informado' }}. Este é um pedido comercial; não é uma reclamação nem uma compra automática.</div>
+<form method="post">{% csrf_token %}
+<div class="form-group"><label for="id_producao"><strong>Produto ou lote disponível</strong></label><select id="id_producao" name="producao" class="form-control"><option value="">Consultar produtos disponíveis</option>{% for r in producoes %}<option value="{{ r.pk }}">{{ r.talhao.cultura|default:'Produto agrícola' }} — {{ r.quantidade }} {{ r.get_unidade_display }} — colheita {{ r.data_colheita|date:'d/m/Y' }}</option>{% endfor %}</select>{% if not producoes %}<small>Não há lote marcado como disponível. Pode enviar um pedido geral.</small>{% endif %}</div>
+<div class="form-group"><label for="id_quantidade"><strong>Quantidade pretendida</strong></label><input id="id_quantidade" name="quantidade" class="form-control" placeholder="Ex.: 500 quilogramas"></div>
+<div class="form-group"><label for="id_contacto"><strong>Telefone ou e-mail para contacto</strong></label><input id="id_contacto" name="contacto" class="form-control" value="{{ request.user.telefone|default:request.user.email }}" required></div>
+<div class="form-group"><label for="id_observacoes"><strong>Condições ou observações</strong></label><textarea id="id_observacoes" name="observacoes" class="form-control" rows="5" placeholder="Prazo, local de entrega, qualidade pretendida ou outra informação."></textarea></div>
+<button class="btn btn-primary" style="width:auto" type="submit"><i class="fas fa-paper-plane"></i> Enviar pedido de compra</button> <a class="btn btn-outline" style="width:auto" href="{% url 'propriedades:mercado_detalhe' propriedade.pk %}">Voltar à oferta</a>
+</form></div></div>
+<style>.form-group{margin-bottom:18px}.form-control{width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #cad7cd;border-radius:9px;margin-top:7px}</style>
+{% endblock %}

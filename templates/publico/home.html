@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}AgroVision - Consultoria Agrícola Inteligente{% endblock %}
+
+{% block content %}
+<nav class="publico-navbar">
+    <a href="{% url 'publico:home' %}" class="logo"><img src="{% static 'img/agrovision-logo.png' %}" alt="AgroVision"></a>
+    <nav>
+        <a href="{% url 'publico:home' %}">Início</a>
+        <a href="{% url 'publico:servicos' %}">Serviços</a>
+        <a href="{% url 'publico:sobre' %}">Sobre</a>
+        <a href="{% url 'publico:contacto' %}">Contacto</a>
+    </nav>
+    <a href="{% url 'contas:login' %}" class="btn-login">Entrar</a>
+</nav>
+
+<section class="hero hero-public" style="--hero-image: url('{% static 'img/P6.png' %}');">
+    <div class="hero-content">
+        <p class="eyebrow">Gestão agrícola digital</p>
+        <h1>Agro<span>Vision</span></h1>
+        <p>Protótipo de plataforma para organizar propriedades, visitas técnicas, recomendações, alertas e dados meteorológicos num ambiente único de trabalho.</p>
+        <div class="hero-actions">
+            <a href="{% url 'contas:login' %}" class="btn btn-laranja">
+                <i class="fas fa-sign-in-alt"></i> Aceder à plataforma
+            </a>
+            <a href="{% url 'publico:servicos' %}" class="btn btn-hero-outline">
+                <i class="fas fa-layer-group"></i> Ver módulos
+            </a>
+        </div>
+    </div>
+    <div class="product-preview" aria-label="Resumo visual do painel AgroVision">
+        <div class="preview-header">
+            <span></span><span></span><span></span>
+            <strong>Painel operacional</strong>
+        </div>
+        <div class="preview-grid">
+            <div><small>Propriedades</small><strong>12</strong></div>
+            <div><small>Alertas</small><strong>4</strong></div>
+            <div><small>Visitas</small><strong>18</strong></div>
+        </div>
+        <div class="preview-list">
+            <p><i class="fas fa-cloud-sun-rain"></i> Risco de chuva intensa no Talhão Norte</p>
+            <p><i class="fas fa-clipboard-list"></i> Recomendação técnica pendente de revisão</p>
+            <p><i class="fas fa-route"></i> Visita de campo agendada para amanhã</p>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section-heading">
+        <p class="eyebrow">Operação no campo</p>
+        <h2>Módulos da plataforma</h2>
+        <p>Módulos essenciais para acompanhar propriedades, visitas e decisões técnicas sem dispersar informação.</p>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card feature-card-media feature-card-illustration">
+            <img src="{% static 'img/Gestão de Propriedades.png' %}" alt="Gestão de propriedades agrícolas">
+            <h3>Gestão de Propriedades</h3>
+            <p>Registo completo de propriedades, talhões e culturas com acompanhamento detalhado.</p>
+        </div>
+        <div class="feature-card feature-card-media feature-card-illustration">
+            <img src="{% static 'img/Meterologia Integra.png' %}" alt="Meteorologia integrada para propriedades agrícolas">
+            <h3>Meteorologia Integrada</h3>
+            <p>Previsões meteorológicas em tempo real para tomada de decisão no campo.</p>
+        </div>
+        <div class="feature-card feature-card-media feature-card-illustration">
+            <img src="{% static 'img/Recomendações Tecnica.png' %}" alt="Recomendações técnicas agronómicas">
+            <h3>Recomendações Técnicas</h3>
+            <p>Recomendações agronómicas personalizadas e exportáveis em PDF.</p>
+        </div>
+        <div class="feature-card feature-card-media feature-card-illustration">
+            <img src="{% static 'img/Dashboards Analiticos.png' %}" alt="Dashboard analítico agrícola">
+            <h3>Dashboards Analíticos</h3>
+            <p>Visualização de dados e indicadores produtivos em tempo real.</p>
+        </div>
+        <div class="feature-card feature-card-media feature-card-illustration">
+            <img src="{% static 'img/Visistas tecnicas.png' %}" alt="Visitas técnicas no campo">
+            <h3>Visitas Técnicas</h3>
+            <p>Registo de visitas de campo com upload de fotografias e observações.</p>
+        </div>
+        <div class="feature-card feature-card-media feature-card-illustration">
+            <img src="{% static 'img/Alertas Automaticos.png' %}" alt="Alertas automáticos para riscos agrícolas">
+            <h3>Alertas Automáticos</h3>
+            <p>Notificações de risco (geada, seca, pragas) para proteger a sua produção.</p>
+        </div>
+    </div>
+</section>
+
+<section class="workflow-band">
+    <div class="workflow-copy">
+        <p class="eyebrow">Da observação à decisão</p>
+        <h2>Menos folhas soltas, mais rastreabilidade técnica</h2>
+        <p>O AgroVision liga propriedades, talhões, visitas, clima e recomendações para que cada decisão tenha contexto e histórico.</p>
+    </div>
+    <div class="workflow-steps">
+        <div><span>01</span><strong>Registar</strong><p>Propriedades, culturas, visitas e ocorrências ficam organizadas por perfil.</p></div>
+        <div><span>02</span><strong>Analisar</strong><p>Indicadores e dados climáticos apoiam a leitura do risco agrícola.</p></div>
+        <div><span>03</span><strong>Recomendar</strong><p>Relatórios técnicos e ações prioritárias chegam às equipas certas.</p></div>
+    </div>
+</section>
+
+<section class="section section-tight">
+    <div class="audience-grid">
+        <div>
+            <p class="eyebrow">Perfis conectados</p>
+            <h2>Uma plataforma para todos os intervenientes</h2>
+            <p>Agricultores, consultores, técnicos, analistas e clientes trabalham sobre os mesmos dados, com permissões adaptadas ao seu papel.</p>
+        </div>
+        <div class="audience-list">
+            <span><i class="fas fa-seedling"></i> Agricultores</span>
+            <span><i class="fas fa-user-tie"></i> Consultores</span>
+            <span><i class="fas fa-microscope"></i> Analistas</span>
+            <span><i class="fas fa-handshake"></i> Clientes</span>
+        </div>
+    </div>
+</section>
+
+<section class="cta-band" style="--section-image: url('{% static 'img/P1.png' %}');">
+    <p class="eyebrow">Acesso ao protótipo</p>
+    <h2>Entrar na plataforma</h2>
+    <p>Aceda ao painel para consultar os módulos principais e navegar pelos fluxos da aplicação.</p>
+    <a href="{% url 'contas:registo' %}" class="btn btn-laranja">
+        <i class="fas fa-user-plus"></i> Criar conta gratuita
+    </a>
+</section>
+
+<footer class="public-footer">
+    <p>AgroVision — Plataforma de Consultoria Agrícola Inteligente</p>
+    <p>© 2026 AgroVision. Todos os direitos reservados.</p>
+</footer>
+{% endblock %}

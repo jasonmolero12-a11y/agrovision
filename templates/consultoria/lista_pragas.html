@@ -1,0 +1,46 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Pragas - AgroVision{% endblock %}
+{% block titulo_pagina %}Pragas <span>e Doenças</span>{% endblock %}
+{% block conteudo %}
+{% if request.user.is_admin or request.user.is_superuser %}<div class="mb-20"><a href="/admin/consultoria/pragadoenca/" target="_blank" class="btn btn-laranja" style="width:auto;"><i class="fas fa-pen-to-square"></i> Gerir pragas e doenças: adicionar, editar ou eliminar</a></div>{% endif %}
+
+{% if request.user.tem_acesso_tecnico or request.user.is_tecnico %}
+<div class="mb-20"><a href="{% url 'consultoria:nova_praga' %}" class="btn btn-primary" style="width: auto;"><i class="fas fa-plus"></i> Registar Praga</a></div>
+{% endif %}
+<form method="get" class="filter-bar mb-20">
+    <input type="text" name="q" value="{{ filtros.q }}" placeholder="Pesquisar praga, talhão ou propriedade" class="form-control">
+    <select name="severidade" class="form-control">
+        <option value="">Todas as severidades</option>
+        {% for valor,label in severidades %}<option value="{{ valor }}" {% if filtros.severidade == valor %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <select name="estado" class="form-control">
+        <option value="">Todos os estados</option>
+        <option value="ativo" {% if filtros.estado == 'ativo' %}selected{% endif %}>Ativo</option>
+        <option value="resolvido" {% if filtros.estado == 'resolvido' %}selected{% endif %}>Resolvido</option>
+    </select>
+    <button class="btn btn-primary" type="submit"><i class="fas fa-filter"></i> Filtrar</button>
+    <a href="{% url 'consultoria:lista_pragas' %}" class="btn btn-outline" style="width:auto;">Limpar</a>
+</form>
+<div class="table-card">
+    <div class="table-header"><h3><i class="fas fa-bug"></i> Pragas e Doenças</h3></div>
+    <table>
+        <thead><tr><th>Foto</th><th>Nome</th><th>Talhão</th><th>Severidade</th><th>Deteção</th><th>Estado</th></tr></thead>
+        <tbody>
+            {% for p in pragas %}
+            <tr>
+                <td>{% if p.foto_diagnostico %}<img class="agro-thumb" src="{{ p.foto_diagnostico.url }}" alt="{{ p.nome }}">{% else %}—{% endif %}</td><td>{{ p.nome }}</td><td>{{ p.talhao.nome }}</td>
+                <td>
+                    {% if p.severidade == 'critica' %}<span class="badge badge-vermelho">{{ p.get_severidade_display }}</span>
+                    {% elif p.severidade == 'alta' %}<span class="badge badge-laranja">{{ p.get_severidade_display }}</span>
+                    {% else %}<span class="badge badge-azul">{{ p.get_severidade_display }}</span>{% endif %}
+                </td>
+                <td>{{ p.data_deteccao|date:'d/m/Y' }}</td>
+                <td>{% if p.resolvido %}<span class="badge badge-verde">Resolvido ✅</span>{% else %}<span class="badge badge-vermelho">Ativo</span>{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center">Nenhuma praga registada.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

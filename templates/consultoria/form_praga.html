@@ -1,0 +1,33 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Nova Praga - AgroVision{% endblock %}
+{% block titulo_pagina %}Registar <span>Praga/Doença</span>{% endblock %}
+{% block conteudo %}
+<div class="table-card" style="max-width: 700px;">
+    <div class="table-header"><h3><i class="fas fa-bug"></i> Registar Praga ou Doença</h3></div>
+    <div style="padding: 24px;">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="margin-bottom: 16px;">
+                <label style="font-weight:600;">Talhão *</label>
+                <select name="talhao" required style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;">
+                    {% for t in talhoes %}<option value="{{ t.pk }}">{{ t.nome }} — {{ t.propriedade.nome }}</option>{% endfor %}
+                </select>
+            </div>
+            <div style="margin-bottom: 16px;"><label style="font-weight:600;">Nome da praga/doença *</label><input type="text" name="nome" required style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 16px;">
+                <div><label style="font-weight:600;">Severidade</label>
+                    <select name="severidade" style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;">
+                        <option value="baixa">Baixa</option><option value="media">Média</option>
+                        <option value="alta">Alta</option><option value="critica">Crítica</option>
+                    </select>
+                </div>
+                <div><label style="font-weight:600;">Data de deteção</label><input type="date" name="data_deteccao" value="{% now 'Y-m-d' %}" style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;"></div>
+            </div>
+            <div style="margin-bottom: 16px;"><label style="font-weight:600;">Tratamento sugerido</label><textarea name="tratamento_sugerido" rows="3" style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;"></textarea></div>
+            <div class="grid-2"><div class="photo-upload-field"><label>Foto do diagnóstico</label><input type="file" name="foto_diagnostico" accept="image/*" class="form-control"></div><div class="photo-upload-field"><label>Foto após tratamento</label><input type="file" name="foto_resultado" accept="image/*" class="form-control"></div></div>
+            <button type="submit" class="btn btn-primary" style="width: auto;"><i class="fas fa-save"></i> Registar</button>
+            <a href="{% url 'consultoria:lista_pragas' %}" class="btn btn-outline" style="width: auto;">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

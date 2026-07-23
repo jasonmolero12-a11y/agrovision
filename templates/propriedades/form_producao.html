@@ -1,0 +1,15 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Registar produção - AgroVision{% endblock %}
+{% block titulo_pagina %}Produção de <span>{{ propriedade.nome }}</span>{% endblock %}
+{% block conteudo %}
+<div class="table-card" style="max-width:760px;"><div class="table-header"><h3>Nova produção/colheita</h3></div><div style="padding:24px;">
+<form method="post" enctype="multipart/form-data">{% csrf_token %}
+<div class="form-group"><label>Talhão *</label><select name="talhao" class="form-control" required>{% for t in talhoes %}<option value="{{ t.pk }}">{{ t.nome }} — {{ t.cultura|default:'Sem cultura' }}</option>{% endfor %}</select></div>
+<div class="grid-2"><div class="form-group"><label>Campanha *</label><input name="campanha" placeholder="Ex.: 2025/2026" class="form-control" required></div><div class="form-group"><label>Data da colheita *</label><input type="date" name="data_colheita" class="form-control" required></div></div>
+<div class="grid-2"><div class="form-group"><label>Quantidade *</label><input type="number" step="0.01" min="0" name="quantidade" class="form-control" required></div><div class="form-group"><label>Unidade</label><select name="unidade" class="form-control"><option value="kg">Quilogramas</option><option value="t">Toneladas</option><option value="sc">Sacos</option></select></div></div>
+<div class="grid-2"><div class="form-group"><label>Qualidade/classificação</label><input name="qualidade" class="form-control" placeholder="Ex.: Tipo A, humidade 13%"></div><div class="form-group"><label>Estado comercial</label><select name="estado_comercial" class="form-control"><option value="disponivel">Disponível</option><option value="reservado">Reservado</option><option value="vendido">Vendido</option></select></div></div>
+<div class="form-group"><label>Observações</label><textarea name="observacoes" rows="3" class="form-control"></textarea></div>
+<div class="photo-upload-field"><label>Fotografia da produção/colheita</label><input type="file" name="foto_colheita" accept="image/*" class="form-control"></div>
+<button class="btn btn-primary" style="width:auto;">Guardar produção</button> <a class="btn btn-outline" style="width:auto;" href="{% url 'propriedades:detalhe' propriedade.pk %}">Cancelar</a>
+</form></div></div>
+{% endblock %}

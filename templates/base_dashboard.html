@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard - AgroVision{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20260718-6">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<a class="skip-link" href="#main-content">Saltar para o conteúdo</a>
+<button class="mobile-menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="sidebar"><i class="fas fa-bars"></i></button>
+<div class="dashboard-wrapper">
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside class="sidebar" id="sidebar" aria-label="Navegação principal">
+        <div class="sidebar-header">
+            <img src="{% static 'img/agrovision-logo.png' %}" alt="AgroVision" class="sidebar-logo-img">
+            <small style="color: rgba(255,255,255,0.6);">Painel de Gestão</small>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li><a href="{% url 'dashboard:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                <span class="icon"><img src="{% static 'img/icons/dashboard.webp' %}" alt=""></span> Dashboard
+            </a></li>
+
+            {% if request.user.is_visitante %}
+            <li><a href="{% url 'contas:solicitar_perfil' %}">
+                <span class="icon"><img src="{% static 'img/icons/solicitar-perfil.webp' %}" alt=""></span> Solicitar Perfil
+            </a></li>
+            {% else %}
+            {% if request.user.is_cliente %}
+            <li><a href="{% url 'propriedades:mercado' %}"><span class="icon"><i class="fas fa-store"></i></span> Mercado Agrícola</a></li>
+            <li><a href="{% url 'propriedades:pedidos_compra' %}"><span class="icon"><i class="fas fa-cart-shopping"></i></span> Pedidos de Compra</a></li>
+            <li><a href="{% url 'propriedades:lista' %}"><span class="icon"><img src="{% static 'img/icons/propriedades.webp' %}" alt=""></span> Fornecedores e Produção</a></li>
+            {% else %}
+            <!-- Propriedades -->
+            <li><a href="{% url 'propriedades:lista' %}" class="{% if request.resolver_match.app_name == 'propriedades' %}active{% endif %}">
+                <span class="icon"><img src="{% static 'img/icons/propriedades.webp' %}" alt=""></span> Propriedades
+            </a></li>
+
+            <!-- Talhões (todos exceto analista) -->
+            <li><a href="{% url 'propriedades:lista_talhoes' %}">
+                <span class="icon"><img src="{% static 'img/icons/talhoes.webp' %}" alt=""></span> Talhões
+            </a></li>
+
+            <!-- Recomendações e relatórios -->
+            {% if request.user.is_agricultor %}
+            <li><a href="{% url 'consultoria:consultoria_api_agricultor' %}"><span class="icon"><i class="fas fa-seedling"></i></span> Consultoria Inteligente</a></li>
+            {% endif %}
+            {% if request.user.tem_acesso_tecnico or request.user.is_agricultor or request.user.is_cliente %}
+            <li><a href="{% url 'consultoria:lista_recomendacoes' %}">
+                <span class="icon"><img src="{% static 'img/icons/recomendacoes.webp' %}" alt=""></span> Recomendações
+            </a></li>
+            {% endif %}
+
+            <!-- Visitas Técnicas -->
+            <li><a href="{% url 'consultoria:lista_visitas' %}">
+                <span class="icon"><img src="{% static 'img/icons/visitas.webp' %}" alt=""></span> Visitas Técnicas
+            </a></li>
+
+            <!-- Meteorologia (todos os autenticados) -->
+            <li><a href="{% url 'meteorologia:previsao' %}">
+                <span class="icon"><img src="{% static 'img/icons/meteorologia.webp' %}" alt=""></span> Meteorologia
+            </a></li>
+
+            <!-- Alertas -->
+            <li><a href="{% url 'meteorologia:lista_alertas' %}">
+                <span class="icon"><img src="{% static 'img/icons/alertas.webp' %}" alt=""></span> Alertas
+            </a></li>
+
+            <!-- Pragas/Doenças (equipa técnica de campo e análise) -->
+            {% if request.user.tem_acesso_tecnico or request.user.is_tecnico %}
+            <li><a href="{% url 'consultoria:lista_pragas' %}">
+                <span class="icon"><img src="{% static 'img/icons/pragas.webp' %}" alt=""></span> Pragas/Doenças
+            </a></li>
+            {% endif %}
+
+            <!-- Gestão de Utilizadores (só Admin) -->
+            {% if request.user.is_admin or request.user.is_superuser %}
+            <li><a href="{% url 'propriedades:pedidos_compra' %}"><span class="icon"><i class="fas fa-cart-shopping"></i></span> Pedidos de Compra</a></li>
+            <li><a href="{% url 'contas:lista_utilizadores' %}">
+                <span class="icon"><img src="{% static 'img/icons/utilizadores.webp' %}" alt=""></span> Utilizadores
+            </a></li>
+            <li><a href="{% url 'config_sistema:config_api' %}">
+                <span class="icon"><img src="{% static 'img/icons/config-api.webp' %}" alt=""></span> Config. API
+            </a></li>
+            <li><a href="/admin/" target="_blank">
+                <span class="icon"><img src="{% static 'img/icons/admin-django.webp' %}" alt=""></span> Admin Django
+            </a></li>
+            {% endif %}
+            {% endif %}
+            {% endif %}
+            <li><a href="{% url 'contas:mensagens_suporte' %}" class="{% if request.resolver_match.url_name == 'mensagens_suporte' %}active{% endif %}">
+                <span class="icon">{% if request.user.is_admin or request.user.is_superuser %}<img src="{% static 'img/icons/atendimento.webp' %}" alt="">{% else %}<img src="{% static 'img/icons/mensagens.webp' %}" alt="">{% endif %}</span>
+                {% if request.user.is_admin or request.user.is_superuser %}Atendimento{% else %}Mensagens{% endif %}
+                {% if notificacoes_mensagens_suporte or notificacoes_respostas_suporte %}<strong> ({{ notificacoes_mensagens_suporte|add:notificacoes_respostas_suporte }})</strong>{% endif %}
+            </a></li>
+        </ul>
+
+        <!-- Info do utilizador no rodapé -->
+        <div class="sidebar-user">
+            <div class="user-info">
+                {% if request.user.foto_perfil %}
+                    <img src="{{ request.user.foto_perfil.url }}" alt="Perfil">
+                {% else %}
+                    <img src="https://ui-avatars.com/api/?name={{ request.user.nome_completo|default:'User' }}&background=2E7D32&color=fff" alt="Avatar">
+                {% endif %}
+                <div>
+                    <div class="user-name">{{ request.user.nome_completo|default:request.user.email|truncatechars:20 }}</div>
+                    <div class="user-role">{{ request.user.get_tipo_utilizador_display }}</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ===================== CONTEÚDO PRINCIPAL ===================== -->
+    <main class="main-content" id="main-content" tabindex="-1">
+        <!-- Cabeçalho da página -->
+        <div class="page-header">
+            <h1>{% block titulo_pagina %}{% endblock %}</h1>
+            <div>
+                {% if not request.user.is_visitante %}
+                <a href="{% if notificacoes_mensagens_suporte or notificacoes_respostas_suporte %}{% url 'contas:mensagens_suporte' %}{% elif request.user.is_cliente %}{% url 'contas:mensagens_suporte' %}{% elif notificacoes_pedidos_pendentes %}{% url 'contas:lista_utilizadores' %}?status=pendente{% else %}{% url 'meteorologia:lista_alertas' %}?estado=nao_lido{% endif %}" class="btn btn-outline notification-button" style="width: auto;">
+                    <i class="fas fa-bell"></i>
+                    {% if notificacoes_total %}
+                        <span class="notification-count">{{ notificacoes_total }}</span>
+                    {% endif %}
+                    Notificações
+                </a>
+                {% endif %}
+                <button type="button" class="btn btn-outline" style="width: auto;" data-speech-target="#explicacao-contextual">
+                    <img class="button-icon" src="{% static 'img/icons/ouvir.webp' %}" alt=""> Explicar esta área
+                </button>
+                <button type="button" class="btn btn-outline btn-icon-only" data-speech-stop title="Parar leitura" aria-label="Parar leitura">
+                    <i class="fas fa-volume-xmark"></i>
+                </button>
+                <a href="{% url 'contas:perfil' %}" class="btn btn-outline" style="width: auto;">
+                    <img class="button-icon" src="{% static 'img/icons/perfil.webp' %}" alt=""> Perfil
+                </a>
+                <a href="{% url 'contas:logout' %}" class="btn btn-danger" style="width: auto;">
+                    <img class="button-icon" src="{% static 'img/icons/sair.webp' %}" alt=""> Sair
+                </a>
+            </div>
+        </div>
+
+        <!-- Mensagens do Django -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        {% if notificacoes_total and not request.user.is_visitante %}
+        <div class="notification-strip">
+            {% if notificacoes_pedidos_pendentes %}
+                <a href="{% url 'contas:lista_utilizadores' %}?status=pendente">
+                    <i class="fas fa-user-clock"></i>
+                    {{ notificacoes_pedidos_pendentes }} solicitação(ões) de perfil pendente(s)
+                </a>
+            {% endif %}
+            {% if notificacoes_mensagens_suporte or notificacoes_respostas_suporte %}
+                <a href="{% url 'contas:mensagens_suporte' %}">
+                    <i class="fas fa-comments"></i> {{ notificacoes_mensagens_suporte|add:notificacoes_respostas_suporte }} mensagem(ns) de atendimento
+                </a>
+            {% endif %}
+                        {% if notificacoes_alertas_pendentes and not request.user.is_cliente %}
+                <a href="{% url 'meteorologia:lista_alertas' %}?estado=nao_lido">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    {{ notificacoes_alertas_pendentes }} alerta(s) não lido(s)
+                </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Conteúdo específico de cada página -->
+        {% block conteudo %}{% endblock %}
+    </main>
+</div>
+
+<div id="explicacao-contextual" class="speech-context" hidden>
+    {% block explicacao_voz %}Esta área organiza as funções disponíveis para o seu perfil. Use o menu lateral para escolher um módulo e os botões da área principal para consultar, criar ou atualizar informações. Os dados visíveis dependem das permissões do seu cargo.{% endblock %}
+</div>
+
+<div id="agro-chatbot-config"
+     data-url="{% url 'dashboard:chatbot' %}"
+     data-user-name="{{ request.user.nome_completo|default:request.user.email|escape }}"
+     data-user-role="{{ request.user.get_tipo_utilizador_display|escape }}"
+     data-csrf="{{ csrf_token }}"></div>
+
+<script src="{% static 'js/chatbot.js' %}?v=20260722-8"></script>
+<script src="{% static 'js/voice-tools.js' %}?v=20260722-8"></script>
+{% block extra_js %}{% endblock %}
+<script>document.addEventListener("DOMContentLoaded",()=>{const b=document.querySelector(".mobile-menu-toggle"),s=document.querySelector(".sidebar");if(!b||!s)return;b.addEventListener("click",()=>{const open=s.classList.toggle("is-open");b.setAttribute("aria-expanded",String(open));b.setAttribute("aria-label",open?"Fechar menu":"Abrir menu")});document.addEventListener("keydown",e=>{if(e.key==="Escape"){s.classList.remove("is-open");b.setAttribute("aria-expanded","false")}})});</script>
+</body>
+</html>

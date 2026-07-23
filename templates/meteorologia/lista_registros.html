@@ -1,0 +1,62 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Registos Clima - AgroVision{% endblock %}
+{% block titulo_pagina %}Histórico <span>de Clima</span>{% endblock %}
+{% block conteudo %}
+{% if request.user.is_admin or request.user.is_superuser %}<div class="mb-20"><a href="/admin/meteorologia/registroclima/" target="_blank" class="btn btn-laranja" style="width:auto;"><i class="fas fa-pen-to-square"></i> Gerir registos climáticos: adicionar, editar ou eliminar</a></div>{% endif %}
+
+<form method="get" class="filter-bar mb-20">
+    <input type="text" name="q" value="{{ filtros.q }}" placeholder="Pesquisar propriedade ou condição climática" class="form-control">
+    <button class="btn btn-primary" type="submit"><i class="fas fa-filter"></i> Filtrar</button>
+    <a href="{% url 'meteorologia:lista_registros' %}" class="btn btn-outline" style="width:auto;">Limpar</a>
+</form>
+<div class="table-card mb-20">
+    <div class="table-header"><h3><i class="fas fa-chart-line"></i> Tendência Climática</h3></div>
+    <div style="padding: 20px;">
+        <canvas id="graficoClima" height="90"></canvas>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="table-header"><h3><i class="fas fa-history"></i> Registos de Clima</h3></div>
+    <table>
+        <thead><tr><th>Propriedade</th><th>Data</th><th>Temp.</th><th>Humidade</th><th>Precip.</th><th>Vento</th></tr></thead>
+        <tbody>
+            {% for r in registros %}
+            <tr>
+                <td>{{ r.propriedade.nome }}</td><td>{{ r.data|date:'d/m/Y H:i' }}</td>
+                <td>{{ r.temperatura|default:'—' }}°C</td><td>{{ r.humidade|default:'—' }}%</td>
+                <td>{{ r.precipitacao|default:'—' }}mm</td><td>{{ r.vento_velocidade|default:'—' }}km/h</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center">Sem registos.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{{ grafico|json_script:"grafico-clima-data" }}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const raw = document.getElementById('grafico-clima-data');
+    if (!raw || !window.Chart) return;
+    const data = JSON.parse(raw.textContent);
+    const ctx = document.getElementById('graficoClima');
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.labels,
+            datasets: [
+                { label: 'Temperatura (°C)', data: data.temperatura, borderColor: '#F57C00', tension: 0.25 },
+                { label: 'Humidade (%)', data: data.humidade, borderColor: '#1976D2', tension: 0.25 },
+                { label: 'Vento (km/h)', data: data.vento, borderColor: '#2E7D32', tension: 0.25 }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+});
+</script>
+{% endblock %}

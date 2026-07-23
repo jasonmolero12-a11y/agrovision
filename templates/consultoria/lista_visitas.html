@@ -1,0 +1,47 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Visitas Técnicas - AgroVision{% endblock %}
+{% block titulo_pagina %}Visitas <span>Técnicas</span>{% endblock %}
+{% block conteudo %}
+{% if request.user.is_admin or request.user.is_superuser %}<div class="mb-20"><a href="/admin/consultoria/visitatecnica/" target="_blank" class="btn btn-laranja" style="width:auto;"><i class="fas fa-pen-to-square"></i> Gerir visitas: adicionar, editar ou eliminar</a></div>{% endif %}
+
+{% if request.user.tem_acesso_tecnico or request.user.is_tecnico %}
+<div class="mb-20"><a href="{% url 'consultoria:nova_visita' %}" class="btn btn-primary" style="width: auto;"><i class="fas fa-plus"></i> Nova Visita</a></div>
+{% endif %}
+<form method="get" class="filter-bar mb-20">
+    <input type="text" name="q" value="{{ filtros.q }}" placeholder="Pesquisar propriedade, responsável ou observação" class="form-control">
+    <select name="tipo" class="form-control">
+        <option value="">Todos os tipos</option>
+        {% for valor,label in tipos_visita %}<option value="{{ valor }}" {% if filtros.tipo == valor %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <button class="btn btn-primary" type="submit"><i class="fas fa-filter"></i> Filtrar</button>
+    <a href="{% url 'consultoria:lista_visitas' %}" class="btn btn-outline" style="width:auto;">Limpar</a>
+</form>
+<div class="table-card">
+    <div class="table-header"><h3><i class="fas fa-route"></i> Visitas Técnicas</h3></div>
+    <table>
+        <thead><tr><th>Propriedade</th><th>Responsável</th><th>Data</th><th>Tipo</th><th>Fotos</th><th>Detalhe</th></tr></thead>
+        <tbody>
+            {% for v in visitas %}
+            <tr>
+                <td>{{ v.propriedade.nome }}</td>
+                <td>{{ v.responsavel.nome_completo }}</td>
+                <td>{{ v.data|date:'d/m/Y' }}</td>
+                <td><span class="badge badge-azul">{{ v.get_tipo_display }}</span></td>
+                <td>{{ v.fotos.count }} <i class="fas fa-camera"></i></td>
+                <td><a href="{% url 'consultoria:detalhe_visita' v.pk %}" class="btn btn-outline" style="width:auto; padding:4px 10px; font-size:0.8rem;"><i class="fas fa-eye"></i></a></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">
+                    <div class="empty-state">
+                        <i class="fas fa-route"></i>
+                        <strong>Nenhuma visita registada</strong>
+                        <span>Quando uma visita técnica for criada, esta tabela mostra a propriedade, responsável, data, tipo de acompanhamento e fotografias associadas.</span>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

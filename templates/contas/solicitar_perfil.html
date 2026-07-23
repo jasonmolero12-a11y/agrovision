@@ -1,0 +1,42 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Solicitar Perfil - AgroVision{% endblock %}
+{% block titulo_pagina %}Solicitação de <span>acesso</span>{% endblock %}
+{% block extra_css %}
+<style>
+.request-shell{max-width:1040px;margin:0 auto}.request-hero{display:grid;grid-template-columns:1.3fr .7fr;gap:24px;background:linear-gradient(135deg,#0b3d20,#1e7a3d);color:#fff;border-radius:22px;padding:32px;box-shadow:0 18px 45px rgba(11,61,32,.18);margin-bottom:24px}.request-hero h2{font-size:30px;margin:0 0 10px}.request-hero p{color:rgba(255,255,255,.83);line-height:1.65}.deadline-card{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:18px;padding:22px}.deadline-card strong{font-size:34px;display:block}.request-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:24px}.request-guide,.request-form{background:#fff;border:1px solid #e4ebe5;border-radius:20px;padding:26px;box-shadow:0 10px 30px rgba(20,55,30,.08)}.guide-item{display:flex;gap:14px;padding:15px 0;border-bottom:1px solid #edf1ed}.guide-item:last-child{border:0}.guide-icon{width:38px;height:38px;border-radius:12px;background:#eaf7ee;color:#18733a;display:grid;place-items:center;flex:none}.request-form .form-group{margin-bottom:19px}.request-form label{display:block;font-weight:700;margin-bottom:8px;color:#183c25}.request-form .form-control{width:100%;border:1px solid #ccd9cf;border-radius:12px;padding:13px 14px;box-sizing:border-box;background:#fbfdfb}.request-form textarea.form-control{resize:vertical}.field-help{display:block;color:#6c7b70;margin-top:7px;font-size:13px}.status-panel{background:#fff7dc;border:1px solid #f0d77b;color:#5a4910;border-radius:18px;padding:24px;margin-bottom:24px}.status-panel.expired{background:#fff1ee;border-color:#f1b8aa;color:#7c2f20}.status-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}.request-progress{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px}.request-progress span{display:flex;align-items:center;gap:8px;padding:10px;border-radius:10px;background:#edf2ee;color:#667269;font-size:13px}.request-progress b{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#d5dfd7}.request-progress .done,.request-progress .active{color:#145b27;font-weight:700}.request-progress .done b,.request-progress .active b{background:#21833d;color:white}@media(max-width:850px){.request-hero,.request-grid{grid-template-columns:1fr}.request-progress{grid-template-columns:1fr 1fr}}@media(max-width:480px){.request-progress{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+{% block conteudo %}
+<div class="request-shell">
+  <nav class="request-progress" aria-label="Etapas da solicitação"><span class="done"><b>1</b> Conta criada</span><span class="active"><b>2</b> Perfil e documentos</span><span><b>3</b> Análise administrativa</span><span><b>4</b> Decisão</span></nav>
+  <section class="request-hero">
+    <div><span style="text-transform:uppercase;letter-spacing:.14em;font-size:12px;font-weight:800;color:#a8e9ba">Acesso profissional</span><h2>Escolha o perfil certo para trabalhar na plataforma</h2><p>Envie os seus dados uma única vez. A equipa AgroVision verificará a informação e comunicará a decisão dentro do sistema.</p></div>
+    <div class="deadline-card"><i class="fas fa-clock" style="font-size:24px"></i><strong>Até 48h</strong><span>Prazo máximo para receber uma resposta da administração.</span></div>
+  </section>
+  {% if pedido_pendente %}
+  <div class="status-panel {% if prazo_expirado %}expired{% endif %}">
+    <h3 style="margin:0 0 8px"><i class="fas fa-hourglass-half"></i> Solicitação em análise</h3>
+    {% if prazo_expirado %}<p>O prazo de 48 horas terminou e ainda não recebeu resposta. Envie uma mensagem para a administração acompanhar o seu caso.</p>{% else %}<p>Recebemos o seu pedido. A resposta será disponibilizada aqui no prazo máximo de 48 horas.</p>{% endif %}
+    <div class="status-actions"><a class="btn btn-primary" style="width:auto" href="{% url 'contas:nova_mensagem_suporte' %}"><i class="fas fa-message"></i> Enviar mensagem</a><a class="btn btn-outline" style="width:auto" href="{% url 'contas:mensagens_suporte' %}">Acompanhar atendimento</a></div>
+  </div>
+  {% endif %}
+  <div class="request-grid">
+    <aside class="request-guide"><h3 style="margin-top:0">O que será analisado</h3>
+      <div class="guide-item"><span class="guide-icon"><i class="fas fa-user-check"></i></span><div><strong>Identidade e objetivo</strong><p>Explique por que precisa do perfil escolhido.</p></div></div>
+      <div class="guide-item"><span class="guide-icon"><i class="fas fa-seedling"></i></span><div><strong>Experiência profissional</strong><p>Agricultor: propriedade e localização. Consultor: certificação ou especialidade. Técnico/Analista: formação e experiência. Cliente comprador: indique os produtos agrícolas, fornecedores ou relatórios de qualidade que pretende consultar.</p></div></div>
+      <div class="guide-item"><span class="guide-icon"><i class="fas fa-file-pdf"></i></span><div><strong>Documento de apoio</strong><p>CV em PDF, com tamanho máximo de 5 MB.</p></div></div>
+      <div class="guide-item"><span class="guide-icon"><i class="fas fa-shield-halved"></i></span><div><strong>Análise segura</strong><p>Os dados serão usados apenas para validar o acesso.</p></div></div>
+    </aside>
+    <section class="request-form"><h3 style="margin-top:0">Dados da solicitação</h3><p style="color:#68756b;margin-bottom:22px">Preencha os campos com informação clara e verificável.</p>
+      <form method="post" enctype="multipart/form-data">{% csrf_token %}
+        {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+        <div class="form-group"><label for="{{ form.perfil_solicitado.id_for_label }}">Perfil pretendido</label>{{ form.perfil_solicitado }}{{ form.perfil_solicitado.errors }}</div>
+        <div class="form-group"><label for="{{ form.justificativa_solicitacao.id_for_label }}">Por que precisa deste acesso?</label>{{ form.justificativa_solicitacao }}{{ form.justificativa_solicitacao.errors }}<span class="field-help">Descreva como pretende utilizar o AgroVision.</span></div>
+        <div class="form-group"><label for="{{ form.validacao_profissional.id_for_label }}">Experiência e validação profissional</label>{{ form.validacao_profissional }}{{ form.validacao_profissional.errors }}<span class="field-help">Responda à orientação correspondente ao perfil escolhido.</span></div>
+        <div class="form-group"><label for="{{ form.cv_solicitacao.id_for_label }}">CV ou documento profissional</label>{{ form.cv_solicitacao }}{{ form.cv_solicitacao.errors }}<span class="field-help">Somente PDF, até 5 MB.</span></div>
+        <button type="submit" class="btn btn-primary" style="width:auto;padding:13px 24px"><i class="fas fa-paper-plane"></i> {% if pedido_pendente %}Atualizar solicitação{% else %}Enviar solicitação{% endif %}</button>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}

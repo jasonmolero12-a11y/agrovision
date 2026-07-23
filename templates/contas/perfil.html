@@ -1,0 +1,72 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Meu Perfil - AgroVision{% endblock %}
+
+{% block conteudo %}
+<div class="page-header">
+    <h1>Meu <span>Perfil</span></h1>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<div class="table-card" style="max-width: 600px;">
+    <div class="table-header">
+        <h3><i class="fas fa-user-edit"></i> Editar dados pessoais</h3>
+    </div>
+    <div style="padding: 24px;">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="font-weight: 600; display: block; margin-bottom: 6px;">Nome completo</label>
+                {{ form.nome_completo }}
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="font-weight: 600; display: block; margin-bottom: 6px;">Telefone</label>
+                {{ form.telefone }}
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="font-weight: 600; display: block; margin-bottom: 6px;">Foto de perfil</label>
+                {{ form.foto_perfil }}
+                {% if request.user.foto_perfil %}
+                    <div style="margin-top: 10px;">
+                        <img src="{{ request.user.foto_perfil.url }}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;" alt="Foto atual">
+                    </div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: auto;">
+                <i class="fas fa-save"></i> Guardar alterações
+            </button>
+        </form>
+
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #EEE;">
+
+        <div>
+            <p><strong><i class="fas fa-envelope"></i> Email:</strong> {{ request.user.email }}</p>
+            <p><strong><i class="fas fa-id-badge"></i> Tipo:</strong> {{ request.user.get_tipo_utilizador_display }}</p>
+            <p><strong><i class="fas fa-calendar"></i> Registo:</strong> {{ request.user.data_registro|date:"d/m/Y H:i" }}</p>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #E0E0E0;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+.form-control:focus {
+    outline: none;
+    border-color: var(--verde-claro);
+}
+</style>
+{% endblock %}

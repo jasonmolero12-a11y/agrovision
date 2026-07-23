@@ -1,0 +1,23 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Responder análise - AgroVision{% endblock %}
+{% block titulo_pagina %}Rever e <span>responder análise</span>{% endblock %}
+{% block explicacao_voz %}Confira os dados enviados pelo agricultor e pelo AgroVision. Corrija o texto técnico, defina a prioridade e guarde. Depois emita a recomendação para disponibilizar a resposta ao agricultor.{% endblock %}
+{% block conteudo %}
+<div class="table-card">
+    <div class="table-header"><h3><i class="fas fa-user-tie"></i> Resposta do consultor</h3></div>
+    <form method="post" style="padding:24px;">{% csrf_token %}
+        <p><strong>Propriedade:</strong> {{ rec.talhao.propriedade.nome }} · <strong>Talhão:</strong> {{ rec.talhao.nome }}</p>
+        <label for="id_dados_solo"><strong>Dados do solo</strong></label>
+        <textarea id="id_dados_solo" name="dados_solo" rows="3" style="width:100%;padding:12px;margin:8px 0 18px;">{{ rec.dados_solo }}</textarea>
+        <label for="id_dados_clima"><strong>Dados meteorológicos</strong></label>
+        <textarea id="id_dados_clima" name="dados_clima" rows="4" style="width:100%;padding:12px;margin:8px 0 18px;">{{ rec.dados_clima }}</textarea>
+        <label for="id_prioridade"><strong>Prioridade</strong></label>
+        <select id="id_prioridade" name="prioridade" style="width:100%;padding:12px;margin:8px 0 18px;">{% for valor, nome in prioridades %}<option value="{{ valor }}" {% if rec.prioridade == valor %}selected{% endif %}>{{ nome }}</option>{% endfor %}</select>
+        <label for="id_texto"><strong>Resposta técnica ao agricultor *</strong></label>
+        <textarea id="id_texto" name="texto_recomendacao" rows="10" required style="width:100%;padding:12px;margin:8px 0 18px;">{{ rec.texto_recomendacao }}</textarea>
+        <div class="alert alert-info"><strong>Importante:</strong> guardar ainda mantém o documento como rascunho. O agricultor só verá a resposta depois de usar o botão Emitir recomendação.</div>
+        <button type="submit" class="btn btn-primary" style="width:auto;"><i class="fas fa-floppy-disk"></i> Guardar resposta</button>
+        <a href="{% url 'consultoria:detalhe_recomendacao' rec.pk %}" class="btn btn-outline" style="width:auto;">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

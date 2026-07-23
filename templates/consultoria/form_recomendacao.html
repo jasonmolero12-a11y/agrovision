@@ -1,0 +1,76 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Nova Recomendação - AgroVision{% endblock %}
+{% block titulo_pagina %}Nova <span>Recomendação</span>{% endblock %}
+{% block conteudo %}
+<div class="table-card" style="max-width: 800px;">
+    <div class="table-header"><h3><i class="fas fa-clipboard-list"></i> Criar Recomendação Agrícola</h3></div>
+    <div style="padding: 24px;">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if risco %}
+            <div class="alert alert-info" style="line-height: 1.7;">
+                <strong>Motor de regras AgroVision</strong><br>
+                Risco estimado para {{ talhao_sugerido.nome }}:
+                <strong>{{ risco.nivel }} ({{ risco.pontos }}/100)</strong>.
+                Prioridade sugerida: <strong>{{ risco.prioridade|title }}</strong>.<br>
+                Fatores:
+                {% for fator in risco.fatores %}
+                    {{ fator }}{% if not forloop.last %}; {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+            <div style="margin-bottom: 16px;">
+                <label style="font-weight:600;">Talhão *</label>
+                <select name="talhao" required onchange="window.location='?talhao=' + this.value" style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;">
+                    {% for t in talhoes %}
+                    <option value="{{ t.pk }}" {% if talhao_sugerido and talhao_sugerido.pk == t.pk %}selected{% endif %}>
+                        {{ t.nome }} — {{ t.propriedade.nome }} ({{ t.cultura|default:'Sem cultura' }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 16px;">
+                <div>
+                    <label style="font-weight:600;">Prioridade</label>
+                    <select name="prioridade" style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;">
+                        <option value="baixa" {% if risco.prioridade == 'baixa' %}selected{% endif %}>Baixa</option>
+                        <option value="media" {% if not risco or risco.prioridade == 'media' %}selected{% endif %}>Média</option>
+                        <option value="alta" {% if risco.prioridade == 'alta' %}selected{% endif %}>Alta</option>
+                        <option value="urgente" {% if risco.prioridade == 'urgente' %}selected{% endif %}>Urgente</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-weight:600;">Estado</label>
+                    <select name="status" style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;">
+                        <option value="rascunho" selected>Rascunho para revisão</option><option value="emitida">Emitida</option><option value="aplicada">Aplicada</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="font-weight:600;">Dados do solo (pH, nutrientes...)</label>
+                <textarea name="dados_solo" rows="3" style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;"></textarea>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="font-weight:600;">Dados do clima</label>
+                <textarea name="dados_clima" rows="3" style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;">{% if risco.ultimo_clima %}Temperatura: {{ risco.ultimo_clima.temperatura|default:'N/A' }}°C
+Humidade: {{ risco.ultimo_clima.humidade|default:'N/A' }}%
+Vento: {{ risco.ultimo_clima.vento_velocidade|default:'N/A' }} km/h
+Condição: {{ risco.ultimo_clima.descricao|default:'N/A' }}{% endif %}</textarea>
+            </div>
+            <div class="alert alert-info" style="margin-bottom:16px;">
+                <label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">
+                    <input type="checkbox" name="gerar_automaticamente" checked style="width:auto; margin-top:5px;">
+                    <span><strong>Gerar automaticamente ao criar</strong><br>O AgroVision recalculará o risco e produzirá a recomendação com base no talhão, cultura, solo, clima, alertas e pragas. A recomendação ficará como rascunho para revisão técnica.</span>
+                </label>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="font-weight:600;">Recomendação técnica *</label>
+                <textarea name="texto_recomendacao" rows="7" required style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;">{{ sugestao }}</textarea>
+            </div>
+            <div class="grid-2"><div class="photo-upload-field"><label>Foto de evidência</label><input type="file" name="foto_evidencia" accept="image/*" class="form-control"></div><div class="photo-upload-field"><label>Foto do resultado</label><input type="file" name="foto_resultado" accept="image/*" class="form-control"></div></div>
+            <button type="submit" class="btn btn-primary" style="width: auto;"><i class="fas fa-save"></i> Gerar e guardar recomendação</button>
+            <a href="{% url 'consultoria:lista_recomendacoes' %}" class="btn btn-outline" style="width: auto;">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

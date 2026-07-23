@@ -1,0 +1,57 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Dashboard Técnico - AgroVision{% endblock %}
+{% block titulo_pagina %}Painel do <span>Técnico de Campo</span> 🟢{% endblock %}
+
+{% block conteudo %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon laranja"><i class="fas fa-route"></i></div>
+        <div class="stat-info"><h3>{{ total_visitas }}</h3><p>Visitas Realizadas</p></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon vermelho"><i class="fas fa-bug"></i></div>
+        <div class="stat-info"><h3>{{ pragas_registadas }}</h3><p>Pragas Registadas</p></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon verde"><i class="fas fa-warehouse"></i></div>
+        <div class="stat-info"><h3>{{ propriedades.count }}</h3><p>Propriedades</p></div>
+    </div>
+</div>
+
+<!-- Ações rápidas -->
+<div class="table-card mb-20">
+    <div class="table-header">
+        <h3><i class="fas fa-bolt"></i> Ações Rápidas</h3>
+    </div>
+    <div style="padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <a href="{% url 'consultoria:nova_visita' %}" class="btn btn-primary" style="width: auto;"><i class="fas fa-plus"></i> Registar Visita</a>
+        <a href="{% url 'consultoria:nova_praga' %}" class="btn btn-laranja" style="width: auto;"><i class="fas fa-plus"></i> Registar Praga</a>
+    </div>
+</div>
+
+<!-- Minhas visitas -->
+<div class="table-card">
+    <div class="table-header">
+        <h3><i class="fas fa-route"></i> Minhas Visitas Recentes</h3>
+        <a href="{% url 'consultoria:lista_visitas' %}" class="btn btn-outline" style="width: auto;">Ver todas</a>
+    </div>
+    <table>
+        <thead>
+            <tr><th>Propriedade</th><th>Data</th><th>Tipo</th><th>Detalhe</th></tr>
+        </thead>
+        <tbody>
+            {% for v in minhas_visitas %}
+            <tr>
+                <td>{{ v.propriedade.nome }}</td>
+                <td>{{ v.data|date:'d/m/Y' }}</td>
+                <td><span class="badge badge-azul">{{ v.get_tipo_display }}</span></td>
+                <td><a href="{% url 'consultoria:detalhe_visita' v.pk %}" class="btn btn-outline" style="width:auto; padding:4px 10px; font-size:0.8rem;">Ver</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center">Nenhuma visita registada.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

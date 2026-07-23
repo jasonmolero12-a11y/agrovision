@@ -1,0 +1,47 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Nova Visita - AgroVision{% endblock %}
+{% block titulo_pagina %}Nova <span>Visita Técnica</span>{% endblock %}
+{% block conteudo %}
+<div class="table-card" style="max-width: 800px;">
+    <div class="table-header"><h3><i class="fas fa-route"></i> Registar Visita Técnica</h3></div>
+    <div style="padding: 24px;">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div style="margin-bottom: 16px;">
+                <label style="font-weight:600;">Propriedade *</label>
+                <select name="propriedade" required style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;">
+                    {% for p in propriedades %}<option value="{{ p.pk }}">{{ p.nome }} ({{ p.proprietario.nome_completo }})</option>{% endfor %}
+                </select>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 16px;">
+                <div>
+                    <label style="font-weight:600;">Data *</label>
+                    <input type="date" name="data" required value="{% now 'Y-m-d' %}" style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;">
+                </div>
+                <div>
+                    <label style="font-weight:600;">Tipo</label>
+                    <select name="tipo" style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;">
+                        <option value="rotineira">Rotineira</option><option value="urgente">Urgente</option>
+                        <option value="avaliacao">Avaliação</option><option value="monitoramento">Monitoramento</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="font-weight:600;">Observações técnicas *</label>
+                <textarea name="observacoes" rows="4" required style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;"></textarea>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="font-weight:600;">Recomendações de campo</label>
+                <textarea name="recomendacao_campo" rows="3" style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;"></textarea>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="font-weight:600;"><i class="fas fa-camera"></i> Fotografias (pode selecionar várias)</label>
+                <input type="file" name="fotos" multiple accept="image/*" style="width:100%; padding:10px; border:2px solid #E0E0E0; border-radius:8px;">
+                <small style="color: var(--cinza-medio);">Pode anexar várias fotos da visita (JPG, PNG).</small>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: auto;"><i class="fas fa-save"></i> Registar Visita</button>
+            <a href="{% url 'consultoria:lista_visitas' %}" class="btn btn-outline" style="width: auto;">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

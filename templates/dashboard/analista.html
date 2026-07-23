@@ -1,0 +1,71 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Dashboard Analista - AgroVision{% endblock %}
+{% block titulo_pagina %}Painel do <span>Analista de Dados</span> 🟠{% endblock %}
+
+{% block conteudo %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon verde"><i class="fas fa-warehouse"></i></div>
+        <div class="stat-info"><h3>{{ total_propriedades }}</h3><p>Propriedades</p></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon laranja"><i class="fas fa-seedling"></i></div>
+        <div class="stat-info"><h3>{{ total_talhoes }}</h3><p>Talhões</p></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon azul"><i class="fas fa-leaf"></i></div>
+        <div class="stat-info"><h3>{{ total_culturas }}</h3><p>Culturas</p></div>
+    </div>
+</div>
+
+<!-- Gráfico de recomendações por prioridade -->
+<div class="table-card mb-20">
+    <div class="table-header">
+        <h3><i class="fas fa-chart-pie"></i> Recomendações por Prioridade</h3>
+    </div>
+    <div style="padding: 24px;">
+        <canvas id="graficoRecomendacoes" height="100"></canvas>
+    </div>
+</div>
+
+<!-- Registros climáticos recentes -->
+<div class="table-card">
+    <div class="table-header">
+        <h3><i class="fas fa-cloud-sun-rain"></i> Registos de Clima Recentes</h3>
+    </div>
+    <table>
+        <thead>
+            <tr><th>Propriedade</th><th>Data</th><th>Temp.</th><th>Humidade</th><th>Precip.</th></tr>
+        </thead>
+        <tbody>
+            {% for r in registros_clima_recentes %}
+            <tr>
+                <td>{{ r.propriedade.nome }}</td>
+                <td>{{ r.data|date:'d/m/Y H:i' }}</td>
+                <td>{{ r.temperatura|default:'—' }}°C</td>
+                <td>{{ r.humidade|default:'—' }}%</td>
+                <td>{{ r.precipitacao|default:'—' }}mm</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center">Sem registos.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+const ctx = document.getElementById('graficoRecomendacoes');
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Baixa', 'Média', 'Alta', 'Urgente'],
+        datasets: [{
+            data: [{{ recomendacoes_por_prioridade.baixa }}, {{ recomendacoes_por_prioridade.media }}, {{ recomendacoes_por_prioridade.alta }}, {{ recomendacoes_por_prioridade.urgente }}],
+            backgroundColor: ['#4CAF50', '#2196F3', '#FF9800', '#F44336']
+        }]
+    },
+    options: { responsive: true }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Culturas - AgroVision{% endblock %}
+{% block titulo_pagina %}Culturas <span>Agrícolas</span>{% endblock %}
+{% block conteudo %}
+{% if request.user.is_admin or request.user.is_superuser %}<div class="mb-20"><a href="/admin/propriedades/cultura/" target="_blank" class="btn btn-laranja" style="width:auto;"><i class="fas fa-pen-to-square"></i> Gerir culturas: adicionar, editar ou eliminar</a></div>{% endif %}
+
+{% if request.user.tem_acesso_tecnico %}
+<div class="mb-20"><a href="{% url 'propriedades:nova_cultura' %}" class="btn btn-primary" style="width: auto;"><i class="fas fa-plus"></i> Nova Cultura</a></div>
+{% endif %}
+<div class="table-card">
+    <div class="table-header"><h3><i class="fas fa-leaf"></i> Culturas Registadas</h3></div>
+    <table>
+        <thead><tr><th>Imagem</th><th>Nome</th><th>Ciclo</th><th>Época de Plantio</th></tr></thead>
+        <tbody>
+            {% for c in culturas %}
+            <tr><td>{% if c.imagem_referencia %}<img class="agro-thumb" src="{{ c.imagem_referencia.url }}" alt="{{ c.nome }}">{% else %}—{% endif %}</td><td>{{ c.nome }}</td><td>{{ c.ciclo|default:'—' }}</td><td>{{ c.epoca_plantio|default:'—' }}</td></tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center">Nenhuma cultura.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

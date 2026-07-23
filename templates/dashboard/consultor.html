@@ -1,0 +1,85 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Dashboard Consultor - AgroVision{% endblock %}
+{% block titulo_pagina %}Painel do <span>Consultor</span> 🟠{% endblock %}
+
+{% block conteudo %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon azul"><i class="fas fa-clipboard-list"></i></div>
+        <div class="stat-info">
+            <h3>{{ total_recomendacoes }}</h3>
+            <p>Recomendações Emitidas</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon laranja"><i class="fas fa-route"></i></div>
+        <div class="stat-info">
+            <h3>{{ total_visitas }}</h3>
+            <p>Visitas Realizadas</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon verde"><i class="fas fa-warehouse"></i></div>
+        <div class="stat-info">
+            <h3>{{ propriedades_consultadas.count }}</h3>
+            <p>Propriedades</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon vermelho"><i class="fas fa-bug"></i></div>
+        <div class="stat-info">
+            <h3>{{ pragas_ativas }}</h3>
+            <p>Pragas Ativas</p>
+        </div>
+    </div>
+</div>
+
+<!-- Ações rápidas -->
+<div class="table-card mb-20">
+    <div class="table-header">
+        <h3><i class="fas fa-bolt"></i> Ações Rápidas</h3>
+    </div>
+    <div style="padding: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <a href="{% url 'consultoria:nova_recomendacao' %}" class="btn btn-primary" style="width: auto;"><i class="fas fa-plus"></i> Nova Recomendação</a>
+        <a href="{% url 'consultoria:lista_visitas' %}" class="btn btn-laranja" style="width: auto;"><i class="fas fa-eye"></i> Consultar Visitas</a>
+        <a href="{% url 'consultoria:lista_pragas' %}" class="btn btn-outline" style="width: auto;"><i class="fas fa-eye"></i> Consultar Pragas</a>
+    </div>
+</div>
+
+<!-- Minhas recomendações recentes -->
+<div class="table-card">
+    <div class="table-header">
+        <h3><i class="fas fa-clipboard-list"></i> Recomendações Recentes</h3>
+        <a href="{% url 'consultoria:lista_recomendacoes' %}" class="btn btn-outline" style="width: auto;">Ver todas</a>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Talhão</th>
+                <th>Data</th>
+                <th>Prioridade</th>
+                <th>Estado</th>
+                <th>PDF</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rec in minhas_recomendacoes %}
+            <tr>
+                <td><a href="{% url 'consultoria:detalhe_recomendacao' rec.pk %}" style="color:var(--verde-principal);font-weight:700;">{{ rec.talhao.nome }}</a></td>
+                <td>{{ rec.data|date:'d/m/Y' }}</td>
+                <td>
+                    {% if rec.prioridade == 'urgente' %}<span class="badge badge-vermelho">{{ rec.get_prioridade_display }}</span>
+                    {% elif rec.prioridade == 'alta' %}<span class="badge badge-laranja">{{ rec.get_prioridade_display }}</span>
+                    {% else %}<span class="badge badge-azul">{{ rec.get_prioridade_display }}</span>{% endif %}
+                </td>
+                <td><span class="badge badge-verde">{{ rec.get_status_display }}</span></td>
+                <td>{% if rec.status == 'rascunho' %}<a href="{% url 'consultoria:responder_recomendacao' rec.pk %}" class="btn btn-laranja" style="width:auto;padding:7px 12px;font-size:0.82rem;"><i class="fas fa-pen-to-square"></i> Avaliar e responder</a>{% else %}<a href="{% url 'consultoria:pdf_recomendacao' rec.pk %}" class="btn btn-outline" style="width:auto;padding:7px 12px;font-size:0.82rem;"><i class="fas fa-file-pdf"></i> PDF</a>{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center">Nenhuma recomendação.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

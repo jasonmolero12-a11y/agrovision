@@ -1,0 +1,28 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Talhões - AgroVision{% endblock %}
+{% block titulo_pagina %}Talhões <span>Agrícolas</span>{% endblock %}
+{% block conteudo %}
+{% if request.user.is_admin or request.user.is_superuser %}<div class="mb-20"><a href="/admin/propriedades/talhao/" target="_blank" class="btn btn-laranja" style="width:auto;"><i class="fas fa-pen-to-square"></i> Gerir talhões: adicionar, editar ou eliminar</a></div>{% endif %}
+
+{% if request.user.is_admin or request.user.is_agricultor %}
+<div class="mb-20"><a href="{% url 'propriedades:novo_talhao' %}" class="btn btn-primary" style="width: auto;"><i class="fas fa-plus"></i> Novo Talhão</a></div>
+{% endif %}
+<form method="get" class="filter-bar mb-20">
+    <input type="text" name="q" value="{{ filtros.q }}" placeholder="Pesquisar talhão, propriedade, cultura ou solo" class="form-control">
+    <button class="btn btn-primary" type="submit"><i class="fas fa-filter"></i> Filtrar</button>
+    <a href="{% url 'propriedades:lista_talhoes' %}" class="btn btn-outline" style="width:auto;">Limpar</a>
+</form>
+<div class="table-card">
+    <div class="table-header"><h3><i class="fas fa-seedling"></i> Talhões Registados</h3></div>
+    <table>
+        <thead><tr><th>Foto</th><th>Nome</th><th>Propriedade</th><th>Cultura</th><th>Área</th><th>Solo</th>{% if request.user.is_admin or request.user.is_agricultor %}<th>Ações</th>{% endif %}</tr></thead>
+        <tbody>
+            {% for t in talhoes %}
+            <tr><td>{% if t.foto_atual %}<img class="agro-thumb" src="{{ t.foto_atual.url }}" alt="{{ t.nome }}">{% else %}—{% endif %}</td><td>{{ t.nome }}</td><td>{{ t.propriedade.nome }}</td><td>{{ t.cultura|default:'—' }}</td><td>{{ t.area|default:'—' }} ha</td><td>{{ t.tipo_solo|default:'—' }}</td>{% if request.user.is_admin or request.user.is_agricultor %}<td><a href="{% url 'propriedades:editar_talhao' t.pk %}" class="btn btn-outline" style="width:auto;padding:6px 12px;"><i class="fas fa-pen"></i> Editar</a></td>{% endif %}</tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center">Nenhum talhão.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

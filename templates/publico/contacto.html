@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contacto - AgroVision{% endblock %}
+
+{% block content %}
+<nav class="publico-navbar">
+    <a href="{% url 'publico:home' %}" class="logo"><img src="{% static 'img/agrovision-logo.png' %}" alt="AgroVision"></a>
+    <nav>
+        <a href="{% url 'publico:home' %}">Início</a>
+        <a href="{% url 'publico:servicos' %}">Serviços</a>
+        <a href="{% url 'publico:sobre' %}">Sobre</a>
+        <a href="{% url 'publico:contacto' %}">Contacto</a>
+    </nav>
+    <a href="{% url 'contas:login' %}" class="btn-login">Entrar</a>
+</nav>
+
+<section class="page-hero compact-hero image-hero" style="--section-image: url('{% static 'img/P6.png' %}');">
+    <p class="eyebrow">Contacto</p>
+    <h1>Fale com a equipa AgroVision</h1>
+    <p>Estamos disponíveis para apoiar produtores, consultores e organizações agrícolas que querem operar com mais dados.</p>
+</section>
+
+<section class="section">
+    <div class="contact-grid">
+        <div class="contact-card">
+            <i class="fas fa-map-marker-alt"></i>
+            <strong>Morada</strong>
+            <span>Luanda, Angola</span>
+        </div>
+        <div class="contact-card">
+            <i class="fas fa-phone"></i>
+            <strong>Telefone</strong>
+            <span>+244 900 000 000</span>
+        </div>
+        <div class="contact-card">
+            <i class="fas fa-envelope"></i>
+            <strong>Email</strong>
+            <span>info@agrovision.ao</span>
+        </div>
+        <div class="contact-card">
+            <i class="fas fa-clock"></i>
+            <strong>Horário</strong>
+            <span>Seg-Sex, 08h00 - 17h00</span>
+        </div>
+    </div>
+</section>
+{% endblock %}

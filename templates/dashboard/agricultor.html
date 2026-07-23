@@ -1,0 +1,75 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Dashboard Agricultor - AgroVision{% endblock %}
+{% block titulo_pagina %}Olá, <span>{{ request.user.nome_completo|default:'Agricultor' }}</span> 🟢{% endblock %}
+
+{% block conteudo %}
+{% if minhas_propriedades %}<div class="mb-20"><a href="{% url 'consultoria:consultoria_api_agricultor' %}" class="btn btn-laranja" style="width:auto;"><i class="fas fa-seedling"></i> Consultoria Inteligente</a> <a href="{% url 'propriedades:nova_producao' minhas_propriedades.first.pk %}" class="btn btn-primary" style="width:auto;"><i class="fas fa-wheat-awn"></i> Registar produção/colheita</a> <a href="{% url 'propriedades:lista' %}" class="btn btn-outline" style="width:auto;"><i class="fas fa-warehouse"></i> Ver minhas propriedades</a></div>{% endif %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon verde"><i class="fas fa-warehouse"></i></div>
+        <div class="stat-info"><h3>{{ total_propriedades }}</h3><p>Minhas Propriedades</p></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon azul"><i class="fas fa-clipboard-list"></i></div>
+        <div class="stat-info"><h3>{{ minhas_recomendacoes.count }}</h3><p>Recomendações</p></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon vermelho"><i class="fas fa-bell"></i></div>
+        <div class="stat-info"><h3>{{ alertas_ativos }}</h3><p>Alertas Ativos</p></div>
+    </div>
+</div>
+
+<!-- Alertas recentes -->
+<div class="table-card mb-20">
+    <div class="table-header">
+        <h3><i class="fas fa-bell"></i> Alertas Recentes</h3>
+        <a href="{% url 'meteorologia:lista_alertas' %}" class="btn btn-outline" style="width: auto;">Ver todos</a>
+    </div>
+    <table>
+        <thead>
+            <tr><th>Tipo</th><th>Mensagem</th><th>Severidade</th><th>Data</th></tr>
+        </thead>
+        <tbody>
+            {% for a in alertas %}
+            <tr>
+                <td><span class="badge badge-laranja">{{ a.get_tipo_display }}</span></td>
+                <td>{{ a.mensagem|truncatechars:60 }}</td>
+                <td>
+                    {% if a.severidade == 'urgente' %}<span class="badge badge-vermelho">{{ a.get_severidade_display }}</span>
+                    {% else %}<span class="badge badge-azul">{{ a.get_severidade_display }}</span>{% endif %}
+                </td>
+                <td>{{ a.data|date:'d/m/Y' }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center">Sem alertas. Tudo em ordem! ✅</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Minhas recomendações -->
+<div class="table-card">
+    <div class="table-header">
+        <h3><i class="fas fa-clipboard-list"></i> Recomendações para as minhas propriedades</h3>
+    </div>
+    <table>
+        <thead>
+            <tr><th>Talhão</th><th>Data</th><th>Prioridade</th><th>Consultor</th><th>PDF</th></tr>
+        </thead>
+        <tbody>
+            {% for rec in minhas_recomendacoes %}
+            <tr>
+                <td>{{ rec.talhao.nome }}</td>
+                <td>{{ rec.data|date:'d/m/Y' }}</td>
+                <td><span class="badge badge-verde">{{ rec.get_prioridade_display }}</span></td>
+                <td>{{ rec.consultor.nome_completo }}</td>
+                <td><a href="{% url 'consultoria:pdf_recomendacao' rec.pk %}" class="btn btn-outline" style="width:auto; padding:4px 10px; font-size:0.8rem;"><i class="fas fa-file-pdf"></i></a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center">Nenhuma recomendação.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

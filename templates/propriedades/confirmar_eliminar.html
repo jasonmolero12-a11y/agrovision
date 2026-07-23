@@ -1,0 +1,20 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Eliminar - AgroVision{% endblock %}
+{% block titulo_pagina %}Eliminar <span>Propriedade</span>{% endblock %}
+{% block conteudo %}
+<div class="table-card" style="max-width: 500px; margin: 0 auto;">
+    <div style="padding: 30px; text-align: center;">
+        <div style="font-size: 3rem; color: #D32F2F; margin-bottom: 15px;"><i class="fas fa-exclamation-triangle"></i></div>
+        <h3 style="color: var(--cinza-escuro); margin-bottom: 10px;">Confirmar Eliminação</h3>
+        <p style="color: var(--cinza-medio); margin-bottom: 25px;">
+            Tem a certeza que pretende eliminar a propriedade <strong>{{ propriedade.nome }}</strong>?
+            <br>Esta ação <strong style="color: #D32F2F;">não pode ser desfeita</strong>.
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" style="width: auto;"><i class="fas fa-trash"></i> Sim, Eliminar</button>
+            <a href="{% url 'propriedades:lista' %}" class="btn btn-outline" style="width: auto;">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

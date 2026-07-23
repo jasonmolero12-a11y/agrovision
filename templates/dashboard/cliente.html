@@ -1,0 +1,16 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Painel do Cliente Comprador - AgroVision{% endblock %}
+{% block titulo_pagina %}Painel do <span>Cliente Comprador</span>{% endblock %}
+{% block explicacao_voz %}Esta é a área do Cliente Comprador. Pode explorar propriedades publicadas com fotografias, comparar ofertas, consultar produtos, quantidades e qualidade, guardar favoritas e enviar pedidos de compra. O cliente não altera propriedades nem informações técnicas.{% endblock %}
+{% block conteudo %}
+<div class="alert alert-info"><strong>Área comercial.</strong> Procure produtos e fornecedores e envie um pedido diretamente a partir da oferta. <a href="{% url 'propriedades:mercado' %}" class="btn btn-outline btn-auto">Explorar Mercado</a></div>
+<div class="stats-grid">
+<div class="stat-card"><div class="stat-icon verde"><i class="fas fa-store"></i></div><div class="stat-info"><h3>{{ total_ofertas }}</h3><p>Ofertas publicadas</p></div></div>
+<div class="stat-card"><div class="stat-icon laranja"><i class="fas fa-heart"></i></div><div class="stat-info"><h3>{{ total_favoritas }}</h3><p>Minhas favoritas</p></div></div>
+<div class="stat-card"><div class="stat-icon azul"><i class="fas fa-cart-shopping"></i></div><div class="stat-info"><h3>{{ total_pedidos }}</h3><p>Pedidos de compra</p></div></div>
+</div>
+<div class="table-card mb-20"><div class="table-header"><h3><i class="fas fa-wheat-awn"></i> Produtos dos fornecedores autorizados</h3></div><div class="table-responsive"><table><thead><tr><th>Produto</th><th>Fornecedor</th><th>Quantidade</th><th>Qualidade</th><th>Estado</th><th>Ação</th></tr></thead><tbody>
+{% for producao in producoes_disponiveis %}<tr><td>{{ producao.talhao.cultura|default:'Não informada' }}</td><td>{{ producao.talhao.propriedade.nome }}</td><td>{{ producao.quantidade }} {{ producao.get_unidade_display }}</td><td>{{ producao.qualidade|default:'Por confirmar' }}</td><td>{{ producao.get_estado_comercial_display }}</td><td><a class="btn btn-primary" style="width:auto;padding:6px 10px" href="{% url 'propriedades:mercado_comprar' producao.talhao.propriedade.pk %}">Comprar</a></td></tr>
+{% empty %}<tr><td colspan="6" class="text-center">Explore o Mercado Agrícola para encontrar ofertas públicas.</td></tr>{% endfor %}</tbody></table></div></div>
+<div class="table-card"><div class="table-header"><h3><i class="fas fa-warehouse"></i> Fornecedores autorizados</h3><a href="{% url 'propriedades:mercado' %}" class="btn btn-outline" style="width:auto">Ver mercado</a></div><div class="weather-list">{% for p in fornecedores %}<div class="weather-row"><i class="fas fa-leaf"></i><div><strong>{{ p.nome }}</strong><span>{{ p.localizacao|default:'Localização não informada' }} · <a href="{% url 'propriedades:mercado_detalhe' p.pk %}">Consultar oferta</a></span></div></div>{% empty %}<div class="empty-state"><strong>Sem fornecedores autorizados</strong><span>Ainda pode consultar todas as ofertas públicas no Mercado Agrícola.</span></div>{% endfor %}</div></div>
+{% endblock %}

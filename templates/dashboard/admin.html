@@ -1,0 +1,104 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Dashboard Administrador - AgroVision{% endblock %}
+{% block titulo_pagina %}Painel do <span>Administrador</span>{% endblock %}
+
+{% block conteudo %}
+<!-- Estatísticas -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon verde"><i class="fas fa-users"></i></div>
+        <div class="stat-info">
+            <h3>{{ total_utilizadores }}</h3>
+            <p>Utilizadores</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon laranja"><i class="fas fa-warehouse"></i></div>
+        <div class="stat-info">
+            <h3>{{ total_propriedades }}</h3>
+            <p>Propriedades</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon azul"><i class="fas fa-clipboard-list"></i></div>
+        <div class="stat-info">
+            <h3>{{ total_recomendacoes }}</h3>
+            <p>Recomendações</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon vermelho"><i class="fas fa-bell"></i></div>
+        <div class="stat-info">
+            <h3>{{ alertas_ativos }}</h3>
+            <p>Alertas Ativos</p>
+        </div>
+    </div>
+</div>
+
+<!-- Ações rápidas -->
+<div class="table-card mb-20">
+    <div class="table-header">
+        <h3><i class="fas fa-bolt"></i> Ações Rápidas</h3>
+    </div>
+    <div class="quick-action-grid">
+        <a href="{% url 'contas:lista_utilizadores' %}" class="btn btn-outline" style="width: auto;"><i class="fas fa-users-cog"></i> Gerir Utilizadores</a>
+        <a href="{% url 'config_sistema:config_api' %}" class="btn btn-outline" style="width: auto;"><i class="fas fa-shield-halved"></i> Segurança e APIs</a>
+        <a href="{% url 'propriedades:nova' %}" class="btn btn-outline" style="width: auto;"><i class="fas fa-plus"></i> Nova Propriedade</a>
+        <a href="/admin/" target="_blank" class="btn btn-laranja" style="width: auto;"><i class="fas fa-tools"></i> Admin Django</a>
+    </div>
+</div>
+
+<div class="table-card mb-20">
+    <div class="table-header"><h3><i class="fas fa-screwdriver-wrench"></i> Centro de Gestão Completa</h3><a href="/admin/" class="btn btn-laranja" target="_blank" style="width:auto;">Abrir gestão completa</a></div>
+    <div style="padding:20px;">
+        <p class="form-note">Em cada área, o administrador pode adicionar, abrir, editar e eliminar registos. As eliminações exigem confirmação.</p>
+        <div class="quick-action-grid">
+            <a href="/admin/contas/utilizador/" target="_blank" class="btn btn-outline">Utilizadores</a>
+            <a href="/admin/propriedades/propriedade/" target="_blank" class="btn btn-outline">Propriedades e compradores</a>
+            <a href="/admin/propriedades/talhao/" target="_blank" class="btn btn-outline">Talhões</a>
+            <a href="/admin/propriedades/cultura/" target="_blank" class="btn btn-outline">Culturas</a>
+            <a href="/admin/propriedades/registoproducao/" target="_blank" class="btn btn-outline">Produção e colheitas</a>
+            <a href="/admin/consultoria/recomendacao/" target="_blank" class="btn btn-outline">Recomendações</a>
+            <a href="/admin/consultoria/visitatecnica/" target="_blank" class="btn btn-outline">Visitas técnicas</a>
+            <a href="/admin/consultoria/pragadoenca/" target="_blank" class="btn btn-outline">Pragas e doenças</a>
+            <a href="/admin/meteorologia/registroclima/" target="_blank" class="btn btn-outline">Registos climáticos</a>
+            <a href="/admin/meteorologia/alerta/" target="_blank" class="btn btn-outline">Alertas</a>
+            <a href="/admin/contas/mensagemsuporte/" target="_blank" class="btn btn-outline">Atendimento</a>
+            <a href="/admin/dashboard/respostachatbot/" target="_blank" class="btn btn-outline">Respostas do chatbot</a>
+            <a href="{% url 'config_sistema:config_api' %}" class="btn btn-outline">Segurança, APIs e inteligência artificial</a>
+        </div>
+    </div>
+</div>
+
+<!-- Últimos utilizadores -->
+<div class="table-card">
+    <div class="table-header">
+        <h3><i class="fas fa-user-clock"></i> Últimos Utilizadores Registados</h3>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Tipo</th>
+                <th>Data</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in ultimos_utilizadores %}
+            <tr>
+                <td>{{ u.nome_completo|default:'—' }}</td>
+                <td>{{ u.email }}</td>
+                <td><span class="badge badge-verde">{{ u.get_tipo_utilizador_display }}</span></td>
+                <td>{{ u.data_registro|date:'d/m/Y' }}</td>
+                <td><a href="/admin/contas/utilizador/{{ u.pk }}/change/" target="_blank" class="btn btn-outline" style="width:auto;padding:4px 10px;"><i class="fas fa-pen"></i> Editar</a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center">Nenhum utilizador.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

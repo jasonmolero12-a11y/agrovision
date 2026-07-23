@@ -1,0 +1,256 @@
+{
+  "cenario": {
+    "propriedade": "Fazenda Horizonte do Kwanza",
+    "talhao": "Talhão Nascente",
+    "producao": 4,
+    "praga": 6,
+    "visita": 8,
+    "recomendacao": 6
+  },
+  "meteorologia": {
+    "real": true,
+    "provedor": "Open-Meteo",
+    "cidade": "Luanda",
+    "erro": null
+  },
+  "perfis": {
+    "Enock": {
+      "tipo": "agricultor",
+      "leituras": {
+        "dashboard:home": {
+          "http": 200,
+          "destino": ""
+        },
+        "propriedades:lista": {
+          "http": 200,
+          "destino": ""
+        },
+        "propriedades:lista_talhoes": {
+          "http": 200,
+          "destino": ""
+        },
+        "consultoria:lista_recomendacoes": {
+          "http": 200,
+          "destino": ""
+        },
+        "consultoria:lista_visitas": {
+          "http": 200,
+          "destino": ""
+        },
+        "consultoria:lista_pragas": {
+          "http": 200,
+          "destino": ""
+        },
+        "meteorologia:previsao": {
+          "http": 200,
+          "destino": ""
+        },
+        "meteorologia:lista_alertas": {
+          "http": 200,
+          "destino": ""
+        },
+        "meteorologia:lista_registros": {
+          "http": 200,
+          "destino": ""
+        },
+        "contas:mensagens_suporte": {
+          "http": 200,
+          "destino": ""
+        }
+      },
+      "chatbot": {
+        "http": 200,
+        "destino": ""
+      },
+      "propriedade_propria": {
+        "http": 200,
+        "destino": ""
+      },
+      "bloqueio_criar_recomendacao": {
+        "http": 302,
+        "destino": "/dashboard/"
+      }
+    },
+    "Ado": {
+      "tipo": "consultor",
+      "leituras": {
+        "dashboard:home": {
+          "http": 200,
+          "destino": ""
+        },
+        "propriedades:lista": {
+          "http": 200,
+          "destino": ""
+        },
+        "propriedades:lista_talhoes": {
+          "http": 200,
+          "destino": ""
+        },
+        "consultoria:lista_recomendacoes": {
+          "http": 200,
+          "destino": ""
+        },
+        "consultoria:lista_visitas": {
+          "http": 200,
+          "destino": ""
+        },
+        "consultoria:lista_pragas": {
+          "http": 200,
+          "destino": ""
+        },
+        "meteorologia:previsao": {
+          "http": 200,
+          "destino": ""
+        },
+        "meteorologia:lista_alertas": {
+          "http": 200,
+          "destino": ""
+        },
+        "meteorologia:lista_registros": {
+          "http": 200,
+          "destino": ""
+        },
+        "contas:mensagens_suporte": {
+          "http": 200,
+          "destino": ""
+        }
+      },
+      "chatbot": {
+        "http": 200,
+        "destino": ""
+      },
+      "criar_recomendacao": {
+        "http": 200,
+        "destino": ""
+      },
+      "pdf": {
+        "http": 200,
+        "destino": ""
+      }
+    },
+    "Priscila": {
+      "tipo": "analista",
+      "leituras": {
+        "dashboard:home": {
+          "http": 200,
+          "destino": ""
+        },
+        "propriedades:lista": {
+          "http": 200,
+          "destino": ""
+        },
+        "propriedades:lista_talhoes": {
+          "http": 200,
+          "destino": ""
+        },
+        "consultoria:lista_recomendacoes": {
+          "http": 200,
+          "destino": ""
+        },
+        "consultoria:lista_visitas": {
+          "http": 200,
+          "destino": ""
+        },
+        "consultoria:lista_pragas": {
+          "http": 200,
+          "destino": ""
+        },
+        "meteorologia:previsao": {
+          "http": 200,
+          "destino": ""
+        },
+        "meteorologia:lista_alertas": {
+          "http": 200,
+          "destino": ""
+        },
+        "meteorologia:lista_registros": {
+          "http": 200,
+          "destino": ""
+        },
+        "contas:mensagens_suporte": {
+          "http": 200,
+          "destino": ""
+        }
+      },
+      "chatbot": {
+        "http": 200,
+        "destino": ""
+      },
+      "leitura_propriedade": {
+        "http": 200,
+        "destino": ""
+      },
+      "bloqueio_edicao": {
+        "http": 302,
+        "destino": "/dashboard/"
+      }
+    },
+    "Garcia": {
+      "tipo": "tecnico",
+      "leituras": {
+        "dashboard:home": {
+          "http": 200,
+          "destino": ""
+        },
+        "propriedades:lista": {
+          "http": 200,
+          "destino": ""
+        },
+        "propriedades:lista_talhoes": {
+          "http": 200,
+          "destino": ""
+        },
+        "consultoria:lista_recomendacoes": {
+          "http": 200,
+          "destino": ""
+        },
+        "consultoria:lista_visitas": {
+          "http": 200,
+          "destino": ""
+        },
+        "consultoria:lista_pragas": {
+          "http": 200,
+          "destino": ""
+        },
+        "meteorologia:previsao": {
+          "http": 200,
+          "destino": ""
+        },
+        "meteorologia:lista_alertas": {
+          "http": 200,
+          "destino": ""
+        },
+        "meteorologia:lista_registros": {
+          "http": 200,
+          "destino": ""
+        },
+        "contas:mensagens_suporte": {
+          "http": 200,
+          "destino": ""
+        }
+      },
+      "chatbot": {
+        "http": 200,
+        "destino": ""
+      },
+      "criar_visita": {
+        "http": 200,
+        "destino": ""
+      },
+      "criar_praga": {
+        "http": 200,
+        "destino": ""
+      },
+      "bloqueio_recomendacao": {
+        "http": 302,
+        "destino": "/dashboard/"
+      }
+    }
+  },
+  "limpeza": {
+    "propriedades_com_teste": 0,
+    "culturas_com_teste": 0,
+    "campanhas_com_teste": 0,
+    "campanhas_demonstracao": 0
+  }
+}

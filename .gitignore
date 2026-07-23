@@ -1,0 +1,44 @@
+# Credenciais e configurações locais
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python e Django
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
+db.sqlite3
+*.sqlite3
+staticfiles/
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+
+# Dados locais e uploads
+media/
+tmp/
+tmp_*/
+_*render*/
+*.log
+
+# Editores e ferramentas locais
+.vscode/
+.idea/
+.agents/
+.codex/
+.DS_Store
+Thumbs.db
+
+# Ficheiros temporários e relatórios gerados
+~$*
+*.docx
+*.pdf
+relatorios/
+

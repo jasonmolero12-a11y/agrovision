@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Serviços - AgroVision{% endblock %}
+
+{% block content %}
+<nav class="publico-navbar">
+    <a href="{% url 'publico:home' %}" class="logo"><img src="{% static 'img/agrovision-logo.png' %}" alt="AgroVision"></a>
+    <nav>
+        <a href="{% url 'publico:home' %}">Início</a>
+        <a href="{% url 'publico:servicos' %}">Serviços</a>
+        <a href="{% url 'publico:sobre' %}">Sobre</a>
+        <a href="{% url 'publico:contacto' %}">Contacto</a>
+    </nav>
+    <a href="{% url 'contas:login' %}" class="btn-login">Entrar</a>
+</nav>
+
+<section class="page-hero compact-hero image-hero" style="--section-image: url('{% static 'img/P4.png' %}');">
+    <p class="eyebrow">Serviços AgroVision</p>
+    <h1>Consultoria agrícola com dados, visitas e alertas no mesmo fluxo</h1>
+    <p>Serviços desenhados para melhorar a leitura técnica da produção e reduzir decisões isoladas.</p>
+</section>
+
+<section class="section">
+    <div class="section-heading">
+        <p class="eyebrow">Áreas de atuação</p>
+        <h2>Nossos Serviços</h2>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card feature-card-media feature-card-photo">
+            <img src="{% static 'img/P1.png' %}" alt="Campo agrícola acompanhado por consultoria agronómica">
+            <h3>Consultoria Agronómica</h3>
+            <p>Acompanhamento técnico de lavouras com recomendações específicas para cada cultura.</p>
+        </div>
+        <div class="feature-card feature-card-media feature-card-photo">
+            <img src="{% static 'img/P2.png' %}" alt="Monitoramento remoto de culturas">
+            <h3>Monitoramento Remoto</h3>
+            <p>Avaliação do desenvolvimento das culturas através de dados integrados.</p>
+        </div>
+        <div class="feature-card feature-card-media feature-card-photo">
+            <img src="{% static 'img/P3.png' %}" alt="Análise técnica agrícola">
+            <h3>Análises Técnicas</h3>
+            <p>Análise de solo e dados nutricionais para manejo otimizado.</p>
+        </div>
+        <div class="feature-card feature-card-media feature-card-photo">
+            <img src="{% static 'img/P4.png' %}" alt="Gestão de pragas e doenças agrícolas">
+            <h3>Gestão de Pragas</h3>
+            <p>Monitoramento e controle de pragas e doenças com foco em sustentabilidade.</p>
+        </div>
+    </div>
+</section>
+
+<section class="service-strip">
+    <div>
+        <i class="fas fa-cloud-sun-rain"></i>
+        <strong>Previsão e risco</strong>
+        <span>Dados climáticos para antecipar operações críticas.</span>
+    </div>
+    <div>
+        <i class="fas fa-file-pdf"></i>
+        <strong>Relatórios técnicos</strong>
+        <span>Recomendações exportáveis e prontas para partilha.</span>
+    </div>
+    <div>
+        <i class="fas fa-camera"></i>
+        <strong>Visitas documentadas</strong>
+        <span>Registos de campo com observações e evidências.</span>
+    </div>
+</section>
+{% endblock %}

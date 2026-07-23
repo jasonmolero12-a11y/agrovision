@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sobre - AgroVision{% endblock %}
+
+{% block content %}
+<nav class="publico-navbar">
+    <a href="{% url 'publico:home' %}" class="logo"><img src="{% static 'img/agrovision-logo.png' %}" alt="AgroVision"></a>
+    <nav>
+        <a href="{% url 'publico:home' %}">Início</a>
+        <a href="{% url 'publico:servicos' %}">Serviços</a>
+        <a href="{% url 'publico:sobre' %}">Sobre</a>
+        <a href="{% url 'publico:contacto' %}">Contacto</a>
+    </nav>
+    <a href="{% url 'contas:login' %}" class="btn-login">Entrar</a>
+</nav>
+
+<section class="page-hero compact-hero image-hero" style="--section-image: url('{% static 'img/fundo tela principal .png' %}');">
+    <p class="eyebrow">Sobre a AgroVision</p>
+    <h1>Tecnologia aplicada à consultoria agrícola</h1>
+    <p>Uma plataforma criada para aproximar equipas técnicas, produtores e clientes através de informação clara e rastreável.</p>
+</section>
+
+<section class="section">
+    <div class="content-panel">
+        <p>A <strong>AgroVision</strong> é uma plataforma de consultoria agrícola inteligente desenvolvida para a empresa
+           <strong>Hispatec</strong>, com o objetivo de transformar a agricultura através da tecnologia.</p>
+        <p>Nossa missão é proporcionar soluções de consultoria agrícola inovadoras e sustentáveis, empoderando os
+           agricultores com conhecimento e ferramentas tecnológicas para maximizar a produtividade e rentabilidade.</p>
+        <p>A plataforma integra <strong>dados agronómicos, meteorológicos e de mercado</strong>, fornecendo recomendações
+           personalizadas e análises preditivas para otimização da produção agrícola.</p>
+        <div class="vision-note">
+            <i class="fas fa-bullseye"></i>
+            <span>Visão: ser reconhecida como líder em consultoria agrícola inteligente até 2030.</span>
+        </div>
+    </div>
+</section>
+{% endblock %}

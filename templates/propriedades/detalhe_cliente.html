@@ -1,0 +1,9 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Fornecedor - AgroVision{% endblock %}
+{% block titulo_pagina %}Fornecedor <span>{{ propriedade.nome }}</span>{% endblock %}
+{% block explicacao_voz %}Esta é a ficha do fornecedor {{ propriedade.nome }}, localizado em {{ propriedade.localizacao|default:'local não informado' }}. Como cliente comprador, pode consultar apenas a produção registada, campanha, quantidade, qualidade e data da colheita. Não pode editar dados técnicos da propriedade.{% endblock %}
+{% block conteudo %}
+<div class="tool-panel mb-20"><div><p class="panel-kicker">Fornecedor autorizado</p><h3>{{ propriedade.nome }}</h3><p>Responsável: {{ propriedade.proprietario.nome_completo }} · {{ propriedade.localizacao|default:'Localização não informada' }}</p></div>{% if propriedade.foto_capa %}<img src="{{ propriedade.foto_capa.url }}" alt="{{ propriedade.nome }}" style="width:180px;height:110px;object-fit:cover;border-radius:14px;">{% endif %}</div>
+<div class="table-card"><div class="table-header"><h3><i class="fas fa-boxes-stacked"></i> Produção disponível para consulta</h3></div><div class="table-responsive"><table><thead><tr><th>Produto</th><th>Campanha</th><th>Quantidade</th><th>Qualidade</th><th>Colheita</th><th>Observações</th></tr></thead><tbody>{% for producao in producoes %}<tr><td>{{ producao.talhao.cultura|default:'Não informada' }}</td><td>{{ producao.campanha }}</td><td>{{ producao.quantidade }} {{ producao.get_unidade_display }}</td><td>{{ producao.qualidade|default:'Por confirmar' }}</td><td>{{ producao.data_colheita|date:'d/m/Y' }}</td><td>{{ producao.observacoes|default:'—' }}</td></tr>{% empty %}<tr><td colspan="6" class="text-center">Este fornecedor ainda não registou produção.</td></tr>{% endfor %}</tbody></table></div></div>
+<div class="mt-20"><a href="{% url 'propriedades:lista' %}" class="btn btn-outline" style="width:auto;">Voltar aos fornecedores</a></div>
+{% endblock %}

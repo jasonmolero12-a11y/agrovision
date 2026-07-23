@@ -1,0 +1,47 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Recomendações - AgroVision{% endblock %}
+{% block titulo_pagina %}Recomendações <span>Agronómicas</span>{% endblock %}
+{% block conteudo %}
+{% if request.user.is_admin or request.user.is_superuser %}<div class="mb-20"><a href="/admin/consultoria/recomendacao/" target="_blank" class="btn btn-laranja" style="width:auto;"><i class="fas fa-pen-to-square"></i> Gerir recomendações: adicionar, editar ou eliminar</a></div>{% endif %}
+
+{% if request.user.tem_acesso_tecnico %}
+<div class="mb-20"><a href="{% url 'consultoria:nova_recomendacao' %}" class="btn btn-primary" style="width: auto;"><i class="fas fa-plus"></i> Nova Recomendação</a></div>
+{% endif %}
+<form method="get" class="filter-bar mb-20">
+    <input type="text" name="q" value="{{ filtros.q }}" placeholder="Pesquisar talhão, propriedade ou texto" class="form-control">
+    <select name="prioridade" class="form-control">
+        <option value="">Todas as prioridades</option>
+        {% for valor,label in prioridades %}<option value="{{ valor }}" {% if filtros.prioridade == valor %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <select name="status" class="form-control">
+        <option value="">Todos os estados</option>
+        {% for valor,label in status_opcoes %}<option value="{{ valor }}" {% if filtros.status == valor %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <button class="btn btn-primary" type="submit"><i class="fas fa-filter"></i> Filtrar</button>
+    <a href="{% url 'consultoria:lista_recomendacoes' %}" class="btn btn-outline" style="width:auto;">Limpar</a>
+</form>
+<div class="table-card">
+    <div class="table-header"><h3><i class="fas fa-clipboard-list"></i> Recomendações</h3></div>
+    <table>
+        <thead><tr><th>Talhão</th><th>Consultor</th><th>Data</th><th>Prioridade</th><th>Estado</th><th>PDF</th></tr></thead>
+        <tbody>
+            {% for rec in recomendacoes %}
+            <tr>
+                <td><a href="{% url 'consultoria:detalhe_recomendacao' rec.pk %}" style="color: var(--verde-principal); font-weight:600;">{{ rec.talhao.nome }}</a></td>
+                <td>{{ rec.consultor.nome_completo }}</td>
+                <td>{{ rec.data|date:'d/m/Y' }}</td>
+                <td>
+                    {% if rec.prioridade == 'urgente' %}<span class="badge badge-vermelho">{{ rec.get_prioridade_display }}</span>
+                    {% elif rec.prioridade == 'alta' %}<span class="badge badge-laranja">{{ rec.get_prioridade_display }}</span>
+                    {% else %}<span class="badge badge-azul">{{ rec.get_prioridade_display }}</span>{% endif %}
+                </td>
+                <td><span class="badge badge-verde">{{ rec.get_status_display }}</span></td>
+                <td><a href="{% url 'consultoria:pdf_recomendacao' rec.pk %}" class="btn btn-outline" style="width:auto; padding:4px 10px; font-size:0.8rem;"><i class="fas fa-file-pdf"></i></a></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center">Nenhuma recomendação.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

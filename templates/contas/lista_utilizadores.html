@@ -1,0 +1,62 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Utilizadores - AgroVision{% endblock %}
+{% block titulo_pagina %}Gestão de <span>Utilizadores</span>{% endblock %}
+{% block conteudo %}
+<!-- Estatísticas rápidas -->
+<div class="stats-grid">
+    <div class="stat-card"><div class="stat-icon verde"><i class="fas fa-users"></i></div><div class="stat-info"><h3>{{ stats.total }}</h3><p>Total</p></div></div>
+    <div class="stat-card"><div class="stat-icon laranja"><i class="fas fa-user-tie"></i></div><div class="stat-info"><h3>{{ stats.consultores }}</h3><p>Consultores</p></div></div>
+    <div class="stat-card"><div class="stat-icon azul"><i class="fas fa-user"></i></div><div class="stat-info"><h3>{{ stats.agricultores }}</h3><p>Agricultores</p></div></div>
+    <div class="stat-card"><div class="stat-icon vermelho"><i class="fas fa-user-shield"></i></div><div class="stat-info"><h3>{{ stats.tecnicos }}</h3><p>Técnicos</p></div></div>
+    <div class="stat-card"><div class="stat-icon verde"><i class="fas fa-handshake"></i></div><div class="stat-info"><h3>{{ stats.clientes }}</h3><p>Clientes</p></div></div>
+</div>
+
+<div class="mb-20">
+    <a href="/admin/contas/utilizador/add/" target="_blank" class="btn btn-primary" style="width: auto;"><i class="fas fa-plus"></i> Novo Utilizador</a>
+</div>
+
+<form method="get" class="filter-bar mb-20">
+    <input type="text" name="q" value="{{ filtros.q }}" placeholder="Pesquisar nome, email ou telefone" class="form-control">
+    <select name="tipo" class="form-control">
+        <option value="">Todos os perfis</option>
+        {% for valor,label in tipos %}<option value="{{ valor }}" {% if filtros.tipo == valor %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <select name="status" class="form-control">
+        <option value="">Todos os pedidos</option>
+        {% for valor,label in status_opcoes %}<option value="{{ valor }}" {% if filtros.status == valor %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <button class="btn btn-primary" type="submit"><i class="fas fa-filter"></i> Filtrar</button>
+    <a href="{% url 'contas:lista_utilizadores' %}" class="btn btn-outline" style="width:auto;">Limpar</a>
+</form>
+
+<div class="table-card">
+    <div class="table-header"><h3><i class="fas fa-users-cog"></i> Utilizadores do Sistema</h3></div>
+    <table>
+        <thead><tr><th>Nome</th><th>Email</th><th>Telefone</th><th>Tipo</th><th>Estado</th><th>Registo</th><th>Ações</th></tr></thead>
+        <tbody>
+            {% for u in utilizadores %}
+            <tr>
+                <td>{{ u.nome_completo|default:'—' }}</td>
+                <td>{{ u.email }}</td>
+                <td>{{ u.telefone|default:'—' }}</td>
+                <td>
+                    {% if u.is_admin or u.is_superuser %}<span class="badge badge-vermelho">{{ u.get_tipo_utilizador_display }}</span>
+                    {% elif u.is_consultor %}<span class="badge badge-laranja">{{ u.get_tipo_utilizador_display }}</span>
+                    {% elif u.is_analista %}<span class="badge badge-azul">{{ u.get_tipo_utilizador_display }}</span>
+                    {% else %}<span class="badge badge-verde">{{ u.get_tipo_utilizador_display }}</span>{% endif %}
+                </td>
+                <td>{% if u.is_active %}<span class="badge badge-verde">Ativo</span>{% else %}<span class="badge badge-cinza">Inativo</span>{% endif %}</td>
+                <td>{{ u.data_registro|date:'d/m/Y' }}</td>
+                <td>
+                    <a href="/admin/contas/utilizador/{{ u.pk }}/change/" target="_blank" class="btn btn-outline" style="width:auto; padding:4px 10px; font-size:0.8rem;"><i class="fas fa-edit"></i></a>
+                    <a href="/admin/contas/utilizador/{{ u.pk }}/password/" target="_blank" class="btn btn-outline" style="width:auto; padding:4px 10px; font-size:0.8rem;"><i class="fas fa-key"></i></a>
+                    <a href="/admin/contas/utilizador/{{ u.pk }}/delete/" target="_blank" class="btn btn-danger" style="width:auto; padding:4px 10px; font-size:0.8rem;"><i class="fas fa-trash"></i></a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="text-center">Nenhum utilizador.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

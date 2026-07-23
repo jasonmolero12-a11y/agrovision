@@ -1,0 +1,157 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Configuração do Sistema - AgroVision{% endblock %}
+{% block titulo_pagina %}Configuração <span>do Sistema</span>{% endblock %}
+{% block conteudo %}
+<div class="table-card" style="max-width: 860px;">
+    <div class="table-header"><h3><i class="fas fa-cloud"></i> Configuração da API Meteorológica</h3></div>
+    <div style="padding: 24px;">
+        <div class="alert alert-info" style="margin-bottom: 20px;">
+            <i class="fas fa-info-circle"></i>
+            <strong>Como funciona:</strong> Escolha o provedor da API e insira a chave (se necessário).
+            Para <strong>OpenWeatherMap</strong>, registe-se gratuitamente em openweathermap.org para obter a chave.
+            O <strong>Open-Meteo</strong> é 100% gratuito e não precisa de chave.
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div style="margin-bottom: 16px;">
+                <label style="font-weight:600; display:block; margin-bottom:6px;">Provedor meteorológico</label>
+                <select name="provedor" id="provedor" onchange="toggleApiKey()" style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;">
+                    <option value="openweather" {% if config.provedor == 'openweather' %}selected{% endif %}>OpenWeatherMap (requer chave)</option>
+                    <option value="openmeteo" {% if config.provedor == 'openmeteo' %}selected{% endif %}>Open-Meteo (gratuito, sem chave)</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 16px;" id="apiKeyBox">
+                <label style="font-weight:600; display:block; margin-bottom:6px;">
+                    <i class="fas fa-key"></i> Chave da API (API Key)
+                </label>
+                <input type="text" name="api_key" value="{{ config.api_key|default:'' }}" placeholder="Insira a sua API key aqui..." style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;">
+                <small style="color: var(--cinza-medio);">
+                    Obtenha a chave gratuita em: <a href="https://openweathermap.org/api" target="_blank" style="color: var(--laranja-principal);">openweathermap.org/api</a>
+                </small>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <label style="font-weight:600; display:block; margin-bottom:6px;">Cidade padrão (para testes)</label>
+                <input type="text" name="cidade_padrao" value="{{ config.cidade_padrao|default:'Luanda' }}" style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;">
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <label style="font-weight:600; display:block; margin-bottom:6px;">URL base (opcional)</label>
+                <input type="text" name="url_base" value="{{ config.url_base|default:'' }}" placeholder="Deixe vazio para usar a padrão" style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" name="ativo" {% if config.ativo %}checked{% endif %} style="width: 18px; height: 18px;">
+                    <span style="font-weight: 600;">Configuração ativa</span>
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: auto;"><i class="fas fa-save"></i> Guardar Configuração</button>
+
+            <button type="button" class="btn btn-laranja" style="width: auto;" onclick="testarApi()">
+                <i class="fas fa-vial"></i> Testar API
+            </button>
+
+            <hr style="margin: 28px 0; border: 0; border-top: 1px solid #E0E0E0;">
+
+            <h3 style="color: var(--verde-principal); margin-bottom: 10px;"><i class="fas fa-brain"></i> API Google/Gemini para IA</h3>
+            <div class="alert alert-info" style="margin-bottom: 18px;">
+                <i class="fas fa-info-circle"></i>
+                Coloque aqui a chave do <strong>Google AI Studio / Gemini</strong>. Se esta opção estiver desligada ou sem internet,
+                o sistema continua a responder com regras internas e perguntas programadas.
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <label style="font-weight:600; display:block; margin-bottom:6px;">Provedor de IA</label>
+                <select name="ia_provedor" style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;">
+                    <option value="gemini" {% if config.ia_provedor == 'gemini' %}selected{% endif %}>Google Gemini</option>
+                    <option value="nenhum" {% if config.ia_provedor == 'nenhum' %}selected{% endif %}>Sem API externa</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <label style="font-weight:600; display:block; margin-bottom:6px;">
+                    <i class="fas fa-key"></i> Chave da API Google/Gemini
+                </label>
+                <input type="password" name="ia_api_key" value="{{ config.ia_api_key|default:'' }}" placeholder="Cole aqui a chave da API Gemini" style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;">
+                <small style="color: var(--cinza-medio);">Esta chave será usada pelo chatbot e pelas recomendações automáticas.</small>
+            </div>
+
+            <div class="grid-2">
+                <div style="margin-bottom: 16px;">
+                    <label style="font-weight:600; display:block; margin-bottom:6px;">Modelo</label>
+                    <input type="text" name="ia_modelo" value="{{ config.ia_modelo|default:'gemini-1.5-flash' }}" style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="font-weight:600; display:block; margin-bottom:6px;">URL base da IA</label>
+                    <input type="text" name="ia_url_base" value="{{ config.ia_url_base|default:'' }}" placeholder="Deixe vazio para usar a padrão" style="width:100%; padding:10px 14px; border:2px solid #E0E0E0; border-radius:8px;">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="checkbox" name="ia_ativo" {% if config.ia_ativo %}checked{% endif %} style="width: 18px; height: 18px;">
+                    <span style="font-weight: 600;">Ativar IA externa com fallback automático</span>
+                </label>
+            </div>
+
+
+            <hr style="margin:28px 0;border:0;border-top:1px solid #E0E0E0;">
+            <h3 style="color:var(--verde-principal);margin-bottom:10px;"><i class="fas fa-shield-halved"></i> Segurança de login e cadastro</h3>
+            <div class="alert alert-info"><strong>Controlo administrativo:</strong> pode alterar estas regras, mas recomendamos mantê-las ativas para impedir contas e acessos inválidos.</div>
+            <div class="security-options">
+                <label><input type="checkbox" name="validar_nome_seguro" {% if config.validar_nome_seguro %}checked{% endif %}> Bloquear nomes formados apenas por símbolos</label>
+                <label><input type="checkbox" name="login_exigir_identificador_valido" {% if config.login_exigir_identificador_valido %}checked{% endif %}> Bloquear identificador de login formado apenas por símbolos</label>
+                <label><input type="checkbox" name="login_exigir_senha_alfanumerica" {% if config.login_exigir_senha_alfanumerica %}checked{% endif %}> Bloquear login com senha formada apenas por símbolos</label>
+                <label><input type="checkbox" name="cadastro_senha_exigir_letra" {% if config.cadastro_senha_exigir_letra %}checked{% endif %}> Exigir pelo menos uma letra nas novas senhas</label>
+                <label><input type="checkbox" name="cadastro_senha_exigir_numero" {% if config.cadastro_senha_exigir_numero %}checked{% endif %}> Exigir pelo menos um número nas novas senhas</label>
+                <label><input type="checkbox" name="permitir_login_por_nome" {% if config.permitir_login_por_nome %}checked{% endif %}> Permitir login por nome completo além do email</label>
+            </div>
+            <style>.security-options{display:grid;gap:10px;margin:16px 0 22px}.security-options label{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid #dce8de;border-radius:8px;background:#f8fcf8}.security-options input{width:18px;height:18px}</style>
+            <button type="submit" class="btn btn-primary" style="width: auto;"><i class="fas fa-save"></i> Guardar todas as configurações</button>
+        </form>
+
+        <!-- Resultado do teste -->
+        <div id="resultadoTeste" style="margin-top: 20px;"></div>
+    </div>
+</div>
+
+<script>
+function toggleApiKey() {
+    const provedor = document.getElementById('provedor').value;
+    const box = document.getElementById('apiKeyBox');
+    if (provedor === 'openmeteo') {
+        box.style.opacity = '0.5';
+        box.querySelector('input').readOnly = true;
+    } else {
+        box.style.opacity = '1';
+        box.querySelector('input').readOnly = false;
+    }
+}
+
+function testarApi() {
+    const resultado = document.getElementById('resultadoTeste');
+    resultado.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> A testar API...</div>';
+
+    fetch("{% url 'config_sistema:testar_api' %}")
+        .then(r => r.json())
+        .then(data => {
+            if (data.sucesso) {
+                resultado.innerHTML = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> ' + data.mensagem + '</div>';
+            } else {
+                resultado.innerHTML = '<div class="alert alert-error"><i class="fas fa-times-circle"></i> ' + data.mensagem + '</div>';
+            }
+        })
+        .catch(() => {
+            resultado.innerHTML = '<div class="alert alert-error"><i class="fas fa-times-circle"></i> Erro ao testar.</div>';
+        });
+}
+
+// Inicializar
+toggleApiKey();
+</script>
+{% endblock %}

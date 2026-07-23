@@ -1,0 +1,47 @@
+{% extends 'base_dashboard.html' %}
+{% block title %}Recomendação - AgroVision{% endblock %}
+{% block titulo_pagina %}Detalhe da <span>Recomendação</span>{% endblock %}
+{% block conteudo %}
+<div class="stats-grid">
+    <div class="stat-card"><div class="stat-icon verde"><i class="fas fa-seedling"></i></div><div class="stat-info"><h3 style="font-size:1.1rem;">{{ rec.talhao.nome }}</h3><p>Talhão — {{ rec.talhao.propriedade.nome }}</p></div></div>
+    <div class="stat-card"><div class="stat-icon laranja"><i class="fas fa-user-tie"></i></div><div class="stat-info"><h3 style="font-size:1.1rem;">{{ rec.consultor.nome_completo }}</h3><p>Consultor — {{ rec.data|date:'d/m/Y' }}</p></div></div>
+    <div class="stat-card"><div class="stat-icon azul"><i class="fas fa-flag"></i></div><div class="stat-info"><h3 style="font-size:1.1rem;">{{ rec.get_prioridade_display }}</h3><p>{{ rec.get_status_display }}</p></div></div>
+</div>
+
+<div class="voice-actions">
+    <button type="button" class="btn btn-outline" style="width:auto;" data-speech-target="#recomendacao-voz">
+        <i class="fas fa-volume-high"></i> Ouvir recomendação
+    </button>
+</div>
+
+<div id="recomendacao-voz" style="display:none;">
+    Recomendação para o talhão {{ rec.talhao.nome }}, propriedade {{ rec.talhao.propriedade.nome }}.
+    Prioridade {{ rec.get_prioridade_display }}. Estado {{ rec.get_status_display }}.
+    Dados do solo: {{ rec.dados_solo|default:'sem dados de solo registados' }}.
+    Dados do clima: {{ rec.dados_clima|default:'sem dados de clima registados' }}.
+    Recomendação técnica: {{ rec.texto_recomendacao }}.
+</div>
+
+<div class="table-card">
+    <div class="table-header"><h3><i class="fas fa-flask"></i> Dados do Solo</h3></div>
+    <div style="padding: 20px;"><p>{{ rec.dados_solo|default:'Sem dados de solo registados.'|linebreaksbr }}</p></div>
+</div>
+<div class="table-card">
+    <div class="table-header"><h3><i class="fas fa-cloud-sun-rain"></i> Dados do Clima</h3></div>
+    <div style="padding: 20px;"><p>{{ rec.dados_clima|default:'Sem dados de clima registados.'|linebreaksbr }}</p></div>
+</div>
+<div class="table-card">
+    <div class="table-header"><h3><i class="fas fa-clipboard-list"></i> Recomendação Técnica</h3></div>
+    <div style="padding: 20px;"><p>{{ rec.texto_recomendacao|linebreaksbr }}</p></div>
+</div>
+
+{% if rec.foto_evidencia or rec.foto_resultado %}<div class="photo-comparison">{% if rec.foto_evidencia %}<figure><img src="{{ rec.foto_evidencia.url }}" alt="Evidência"><figcaption>Evidência inicial</figcaption></figure>{% endif %}{% if rec.foto_resultado %}<figure><img src="{{ rec.foto_resultado.url }}" alt="Resultado"><figcaption>Resultado após aplicação</figcaption></figure>{% endif %}</div>{% endif %}
+<div class="mt-20">
+    {% if rec.status == 'rascunho' and request.user.is_consultor or rec.status == 'rascunho' and request.user.is_admin or rec.status == 'rascunho' and request.user.is_superuser %}
+    <a href="{% url 'consultoria:responder_recomendacao' rec.pk %}" class="btn btn-laranja" style="width:auto;"><i class="fas fa-pen-to-square"></i> Rever e responder</a>
+    <form method="post" action="{% url 'consultoria:emitir_recomendacao' rec.pk %}" style="display:inline;">{% csrf_token %}<button type="submit" class="btn btn-primary" style="width:auto;"><i class="fas fa-paper-plane"></i> Emitir recomendação</button></form>
+    {% endif %}
+    {% if rec.status == 'emitida' or rec.status == 'aplicada' %}<a href="{% url 'consultoria:pdf_recomendacao' rec.pk %}" class="btn btn-laranja" style="width: auto;"><i class="fas fa-file-pdf"></i> Exportar PDF</a>{% endif %}
+    <a href="{% url 'consultoria:lista_recomendacoes' %}" class="btn btn-outline" style="width: auto;"><i class="fas fa-arrow-left"></i> Voltar</a>
+</div>
+{% endblock %}
