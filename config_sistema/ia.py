@@ -31,7 +31,7 @@ def gerar_texto_ia(prompt, contexto='', timeout=60, pesquisa_web=False):
         ],
         'generationConfig': {
             'temperature': 0.35,
-            'maxOutputTokens': 700,
+            'maxOutputTokens': 8192,
         },
     }
     if pesquisa_web:
