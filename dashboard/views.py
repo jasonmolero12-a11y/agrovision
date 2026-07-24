@@ -423,12 +423,18 @@ def dashboard_home(request):
     # CONSULTOR AGRÍCOLA → recomendações e visitas
     # ====================================================================
     elif user.is_consultor:
+        propriedades_consultadas = Propriedade.objects.filter(
+            consultor_responsavel=user
+        )
+        visitas_da_equipa = VisitaTecnica.objects.filter(
+            propriedade__in=propriedades_consultadas
+        ).order_by('-data')
         context = {
             'minhas_recomendacoes': Recomendacao.objects.filter(consultor=user).order_by('-data')[:5],
             'total_recomendacoes': Recomendacao.objects.filter(consultor=user).count(),
-            'minhas_visitas': VisitaTecnica.objects.filter(responsavel=user).order_by('-data')[:5],
-            'total_visitas': VisitaTecnica.objects.filter(responsavel=user).count(),
-            'propriedades_consultadas': Propriedade.objects.filter(consultor_responsavel=user),
+            'minhas_visitas': visitas_da_equipa[:5],
+            'total_visitas': visitas_da_equipa.count(),
+            'propriedades_consultadas': propriedades_consultadas,
             'pragas_ativas': PragaDoenca.objects.filter(resolvido=False, talhao__propriedade__consultor_responsavel=user).count(),
         }
         return render(request, 'dashboard/consultor.html', context)
@@ -437,20 +443,24 @@ def dashboard_home(request):
     # ANALISTA DE DADOS → gráficos e estatísticas
     # ====================================================================
     elif user.is_analista:
-        # Dados para gráficos
-        culturas = Cultura.objects.all()
+        propriedades = Propriedade.objects.filter(analista_responsavel=user)
+        talhoes = Talhao.objects.filter(propriedade__in=propriedades)
+        culturas = Cultura.objects.filter(talhao__in=talhoes).distinct()
+        recomendacoes = Recomendacao.objects.filter(talhao__in=talhoes)
         context = {
-            'total_propriedades': Propriedade.objects.count(),
-            'total_talhoes': Talhao.objects.count(),
+            'total_propriedades': propriedades.count(),
+            'total_talhoes': talhoes.count(),
             'total_culturas': culturas.count(),
             'recomendacoes_por_prioridade': {
-                'baixa': Recomendacao.objects.filter(prioridade='baixa').count(),
-                'media': Recomendacao.objects.filter(prioridade='media').count(),
-                'alta': Recomendacao.objects.filter(prioridade='alta').count(),
-                'urgente': Recomendacao.objects.filter(prioridade='urgente').count(),
+                'baixa': recomendacoes.filter(prioridade='baixa').count(),
+                'media': recomendacoes.filter(prioridade='media').count(),
+                'alta': recomendacoes.filter(prioridade='alta').count(),
+                'urgente': recomendacoes.filter(prioridade='urgente').count(),
             },
             'culturas': culturas,
-            'registros_clima_recentes': RegistroClima.objects.order_by('-data')[:10],
+            'registros_clima_recentes': RegistroClima.objects.filter(
+                propriedade__in=propriedades
+            ).order_by('-data')[:10],
         }
         return render(request, 'dashboard/analista.html', context)
 
@@ -458,11 +468,14 @@ def dashboard_home(request):
     # TÉCNICO DE CAMPO → inserção de dados
     # ====================================================================
     elif user.is_tecnico:
+        propriedades = Propriedade.objects.filter(tecnico_responsavel=user)
         context = {
             'minhas_visitas': VisitaTecnica.objects.filter(responsavel=user).order_by('-data')[:5],
             'total_visitas': VisitaTecnica.objects.filter(responsavel=user).count(),
-            'pragas_registadas': PragaDoenca.objects.filter(talhao__propriedade__consultor_responsavel=user).count(),
-            'propriedades': Propriedade.objects.all()[:6],
+            'pragas_registadas': PragaDoenca.objects.filter(
+                talhao__propriedade__in=propriedades
+            ).count(),
+            'propriedades': propriedades[:6],
         }
         return render(request, 'dashboard/tecnico.html', context)
 

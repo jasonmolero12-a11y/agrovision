@@ -1,9 +1,11 @@
+from datetime import date
 from unittest.mock import patch
 
 from django.test import TestCase
 from django.urls import reverse
 
 from contas.models import Utilizador
+from consultoria.models import VisitaTecnica
 from propriedades.models import Propriedade, Talhao, Cultura
 
 
@@ -52,6 +54,87 @@ class MatrizPermissoesEFormulariosTests(TestCase):
         self.assertEqual(self.client.get(reverse('propriedades:lista')).status_code, 200)
         for rota in ['propriedades:nova', 'propriedades:novo_talhao', 'propriedades:nova_cultura', 'consultoria:nova_recomendacao', 'consultoria:nova_visita', 'consultoria:nova_praga']:
             self.assertEqual(self.client.get(reverse(rota)).status_code, 302, rota)
+
+    def test_consultor_recebe_visita_feita_pelo_tecnico_da_equipa(self):
+        visita = VisitaTecnica.objects.create(
+            propriedade=self.propriedade,
+            responsavel=self.tecnico,
+            data=date(2026, 7, 24),
+            tipo='monitoramento',
+            observacoes='Visita técnica encaminhada ao consultor.',
+        )
+        self.entrar(self.consultor)
+
+        lista = self.client.get(reverse('consultoria:lista_visitas'))
+        self.assertEqual(lista.status_code, 200)
+        self.assertIn(visita, list(lista.context['visitas']))
+        self.assertEqual(
+            self.client.get(
+                reverse('consultoria:detalhe_visita', args=[visita.pk])
+            ).status_code,
+            200,
+        )
+
+        painel = self.client.get(reverse('dashboard:home'))
+        self.assertEqual(painel.context['total_visitas'], 1)
+        self.assertContains(painel, 'Visitas da Equipa')
+
+    def test_consultor_nao_recebe_visita_de_outra_equipa(self):
+        outro_agricultor = Utilizador.objects.create_user(
+            email='fora.equipa@teste.ao',
+            password='Teste123!',
+            nome_completo='Agricultor Fora da Equipa',
+            tipo_utilizador='agricultor',
+        )
+        propriedade_externa = Propriedade.objects.create(
+            nome='Propriedade Fora da Equipa',
+            proprietario=outro_agricultor,
+        )
+        visita_externa = VisitaTecnica.objects.create(
+            propriedade=propriedade_externa,
+            responsavel=self.tecnico,
+            data=date(2026, 7, 24),
+            tipo='avaliacao',
+            observacoes='Visita que não pertence ao consultor.',
+        )
+        self.entrar(self.consultor)
+        lista = self.client.get(reverse('consultoria:lista_visitas'))
+        self.assertNotContains(lista, visita_externa.observacoes)
+        self.assertEqual(
+            self.client.get(
+                reverse('consultoria:detalhe_visita', args=[visita_externa.pk])
+            ).status_code,
+            404,
+        )
+
+    def test_dashboard_analista_limita_dados_a_equipa_atribuida(self):
+        outro_agricultor = Utilizador.objects.create_user(
+            email='fora.analise@teste.ao',
+            password='Teste123!',
+            nome_completo='Agricultor Fora da Análise',
+            tipo_utilizador='agricultor',
+        )
+        propriedade_externa = Propriedade.objects.create(
+            nome='Propriedade Fora da Análise',
+            proprietario=outro_agricultor,
+        )
+        cultura_externa = Cultura.objects.create(
+            nome='Cultura Fora da Análise',
+            ciclo='Anual',
+        )
+        Talhao.objects.create(
+            propriedade=propriedade_externa,
+            nome='Talhão Fora da Análise',
+            cultura=cultura_externa,
+        )
+        self.entrar(self.analista)
+        painel = self.client.get(reverse('dashboard:home'))
+        self.assertEqual(painel.context['total_propriedades'], 1)
+        self.assertEqual(painel.context['total_talhoes'], 1)
+        self.assertEqual(painel.context['total_culturas'], 1)
+        culturas_visiveis = list(painel.context['culturas'])
+        self.assertIn(self.cultura, culturas_visiveis)
+        self.assertNotIn(cultura_externa, culturas_visiveis)
 
     def test_tecnico_tem_campos_de_campo(self):
         self.entrar(self.tecnico)

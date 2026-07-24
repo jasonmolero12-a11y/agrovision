@@ -43,7 +43,12 @@ def _recomendacoes_visiveis(user):
 
 
 def _visitas_visiveis(user):
-    if user.is_consultor or user.is_tecnico:
+    if user.is_consultor:
+        return VisitaTecnica.objects.filter(
+            Q(responsavel=user)
+            | Q(propriedade__consultor_responsavel=user)
+        ).distinct()
+    if user.is_tecnico:
         return VisitaTecnica.objects.filter(responsavel=user)
     return VisitaTecnica.objects.filter(propriedade__in=_propriedades_visiveis(user))
 
